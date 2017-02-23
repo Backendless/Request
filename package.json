@@ -1,6 +1,6 @@
 {
   "name": "backendless-request",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Simple Node.js and browser REST client",
   "main": "lib/index.js",
   "files": [
