@@ -386,8 +386,8 @@ Object.defineProperty(Request, 'FormData', {
 Request.methods = ['get', 'post', 'put', 'patch', 'delete']
 
 Request.methods.forEach(method => {
-  Request[method] = function(path) {
-    return new Request(path, method)
+  Request[method] = function(path, body) {
+    return new Request(path, method, body)
   }
 })
 
