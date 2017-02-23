@@ -60,10 +60,10 @@ const tagsContainMatches = (a, b) => {
 export default class Cache {
 
   /**
-   * @param {Number?} flushInternal
+   * @param {Number?} flushInterval
    */
-  constructor(flushInternal) {
-    this.flushInterval = flushInternal
+  constructor(flushInterval) {
+    this.flushInterval = flushInterval
 
     /**
      * @type {Map.<String, CacheItem>}
@@ -97,7 +97,7 @@ export default class Cache {
     this.map.set(key, cacheItem(value, tags, currentTime() + ttl))
 
     if (this.flushInterval && !this.flushTimer) {
-      this.flushTimer = setInterval(this.flush.bind(this), flushInternal).unref()
+      this.flushTimer = setInterval(this.flush.bind(this), this.flushInterval).unref()
     }
   }
 
