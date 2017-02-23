@@ -97,7 +97,11 @@ export default class Cache {
     this.map.set(key, cacheItem(value, tags, currentTime() + ttl))
 
     if (this.flushInterval && !this.flushTimer) {
-      this.flushTimer = setInterval(this.flush.bind(this), this.flushInterval).unref()
+      this.flushTimer = setInterval(this.flush.bind(this), this.flushInterval)
+
+      if (this.flushTimer.unref) {
+        this.flushTimer.unref()
+      }
     }
   }
 
