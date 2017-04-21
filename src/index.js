@@ -141,7 +141,7 @@ const sendNodeAPIRequest = (path, method, headers, body) => {
         _send()
       })
     } else {
-      if (method === 'DELETE' && body) {
+      if (body && !options.headers['content-length']) {
         const Buffer = require('buffer').Buffer
         options.headers['content-length'] = Buffer.byteLength(body)
       }
