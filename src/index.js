@@ -263,6 +263,20 @@ class Request {
   }
 
   /**
+   * Reset cache if passed TRUE and tags has been specified before
+   *
+   * @param {Boolean} reset - flag to reset cache or not
+   * @returns {Request}
+   */
+  resetCache(reset) {
+    if (reset && this.tags) {
+      cache.deleteByTags(this.tags)
+    }
+
+    return this
+  }
+
+  /**
    * Shortcut for req.set('Content-Type', value)
    *
    * @param {String} contentType
