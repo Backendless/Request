@@ -123,11 +123,11 @@ const sendNodeAPIRequest = (path, method, headers, body) => {
           body.pipe(req)
         } else {
           req.write(body)
+          req.end()
         }
       }
 
       req.on('error', reject)
-      req.end()
     }
 
     if (form) {
