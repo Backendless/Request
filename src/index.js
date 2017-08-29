@@ -118,15 +118,17 @@ const sendNodeAPIRequest = (path, method, headers, body) => {
         res.on('error', reject)
       })
 
+      req.on('error', reject)
+
       if (body) {
         if (isStream(body)) {
           body.pipe(req)
-        } else {
-          req.write(body)
+          return
         }
+
+        req.write(body)
       }
 
-      req.on('error', reject)
       req.end()
     }
 
