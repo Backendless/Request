@@ -194,11 +194,10 @@ class Request {
    */
   set(key, value) {
     if (isObject(key)) {
-      this.headers = {
-        ...this.headers,
-        ...key
+      for (const headerName in key) {
+        this.set(headerName, key[headerName])
       }
-    } else {
+    } else if (typeof value !== 'undefined'){
       this.headers[key] = value
     }
 
@@ -366,6 +365,10 @@ class Request {
       return res
     }
 
+    if (Request.verbose) {
+      console.log(this.method.toUpperCase(), decodeURIComponent(path), body, this.headers)
+    }
+
     return sendRequest(path, this.method.toUpperCase(), this.headers, body)
       .then(parseBody)
       .then(checkStatus)
@@ -404,6 +407,7 @@ Object.defineProperty(Request, 'FormData', {
   }
 })
 
+Request.verbose = false
 Request.methods = ['get', 'post', 'put', 'patch', 'delete']
 
 Request.methods.forEach(method => {
