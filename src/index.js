@@ -90,7 +90,7 @@ const sendXmlHttpRequest = (path, method, headers, body) => {
   })
 }
 
-const sendNodeAPIRequest = (path, method, headers, body) => {
+const sendNodeAPIRequest = (path, method, headers, body, encoding) => {
   return new Promise((resolve, reject) => {
     const u = require('url').parse(path)
     const form = isFormData(body) && body
@@ -108,13 +108,38 @@ const sendNodeAPIRequest = (path, method, headers, body) => {
       const httpClient = require(https ? 'https' : 'http')
 
       const req = httpClient.request(options, res => {
-        res.setEncoding('utf8')
+        const  strings =[]
+        const  buffers =[]
+        let bufferLength = 0
+        let body = ''
 
         const { statusCode: status, statusMessage: statusText, headers } = res
 
-        let body = ''
-        res.on('data', chunk => body += chunk)
-        res.on('end', () => resolve({ status, statusText, headers, body }))
+        res.on('data', chunk => {
+          if (!Buffer.isBuffer(chunk)) {
+            strings.push(chunk)
+
+          } else if (chunk.length) {
+            bufferLength += chunk.length
+            buffers.push(chunk)
+          }
+        })
+
+        res.on('end', () => {
+          if (bufferLength) {
+            body = Buffer.concat(buffers, bufferLength)
+
+            if (encoding != null) {
+              body = body.toString(encoding)
+            }
+
+          } else if (strings.length) {
+            body = strings.join()
+          }
+
+          resolve({ status, statusText, headers, body })
+        })
+
         res.on('error', reject)
       })
 
@@ -183,6 +208,7 @@ class Request {
     this.cacheTTL = 0
     this.headers = {}
     this.queryParams = {}
+    this.encoding = 'utf8'
   }
 
   /**
@@ -306,6 +332,19 @@ class Request {
   }
 
   /**
+   * set encoding to response
+   * works only for Node js
+   *
+   * @param {String} encoding
+   * @returns {Request}
+   */
+  setEncoding(encoding){
+    this.encoding = encoding
+
+    return this
+  }
+
+  /**
    * Sends the requst
    *
    * @param {Object} body
@@ -369,7 +408,7 @@ class Request {
       console.log(this.method.toUpperCase(), decodeURIComponent(path), body, this.headers)
     }
 
-    return sendRequest(path, this.method.toUpperCase(), this.headers, body)
+    return sendRequest(path, this.method.toUpperCase(), this.headers, body, this.encoding)
       .then(parseBody)
       .then(checkStatus)
       .then(unwrapBody)
