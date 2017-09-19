@@ -92,7 +92,6 @@ const sendXmlHttpRequest = (path, method, headers, body) => {
 
 const sendNodeAPIRequest = (path, method, headers, body, encoding) => {
   return new Promise((resolve, reject) => {
-    const Buffer = require('buffer').Buffer
     const u = require('url').parse(path)
     const form = isFormData(body) && body
 
@@ -135,7 +134,7 @@ const sendNodeAPIRequest = (path, method, headers, body, encoding) => {
             }
 
           } else if (strings.length) {
-            body = strings.join('')
+            body = strings.join()
           }
 
           resolve({ status, statusText, headers, body })
