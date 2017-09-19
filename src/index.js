@@ -129,7 +129,7 @@ const sendNodeAPIRequest = (path, method, headers, body, encoding) => {
           if (bufferLength) {
             body = Buffer.concat(buffers, bufferLength)
 
-            if (encoding !== null) {
+            if (encoding != null) {
               body = body.toString(encoding)
             }
 
