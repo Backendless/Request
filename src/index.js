@@ -178,8 +178,6 @@ const sendNodeAPIRequest = (path, method, headers, body, encoding) => {
   })
 }
 
-const sendRequest = typeof XMLHttpRequest !== 'undefined' ? sendXmlHttpRequest : sendNodeAPIRequest
-
 /**
  * Checks if a network request came back fine, and throws an error if not
  *
@@ -408,7 +406,7 @@ class Request {
       console.log(this.method.toUpperCase(), decodeURIComponent(path), body, this.headers)
     }
 
-    return sendRequest(path, this.method.toUpperCase(), this.headers, body, this.encoding)
+    return Request.send(path, this.method.toUpperCase(), this.headers, body, this.encoding)
       .then(parseBody)
       .then(checkStatus)
       .then(unwrapBody)
@@ -445,6 +443,16 @@ Object.defineProperty(Request, 'FormData', {
     return require('form-data')
   }
 })
+
+Request.XMLHttpRequest = XMLHttpRequest
+
+Request.send = (path, method, headers, body, encoding) => {
+  const sender = typeof Request.XMLHttpRequest !== 'undefined'
+    ? sendXmlHttpRequest
+    : sendNodeAPIRequest
+
+  return sender(path, method, headers, body, encoding)
+}
 
 Request.verbose = false
 Request.methods = ['get', 'post', 'put', 'patch', 'delete']
