@@ -440,11 +440,11 @@ class Request {
 
 Object.defineProperty(Request, 'FormData', {
   get() {
-    return require('form-data')
+    return typeof FormData !== 'undefined' ? FormData : require('form-data')
   }
 })
 
-Request.XMLHttpRequest = XMLHttpRequest
+Request.XMLHttpRequest = typeof XMLHttpRequest !== 'undefined' ? XMLHttpRequest : undefined
 
 Request.send = (path, method, headers, body, encoding) => {
   const sender = typeof Request.XMLHttpRequest !== 'undefined'
