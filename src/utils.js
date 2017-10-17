@@ -9,7 +9,7 @@ export const castArray = value => {
 export const isObject = value => null != value && typeof value === 'object'
 
 export const isFormData = value => {
-  return value && value.constructor && value.constructor.name === 'FormData'
+  return value && value.constructor && value.constructor.toString().trim().indexOf('function FormData') === 0
 }
 
 export const isStream = value => {
