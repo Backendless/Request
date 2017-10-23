@@ -56,7 +56,7 @@ function parseHeaders(headersString) {
 
 const sendXmlHttpRequest = (path, method, headers, body) => {
   return new Promise(function sendRequest(resolve, reject) {
-    let request = new XMLHttpRequest()
+    let request = new Request.XMLHttpRequest()
 
     request.open(method.toUpperCase(), path, true)
 
@@ -105,6 +105,7 @@ const sendNodeAPIRequest = (path, method, headers, body, encoding) => {
     }
 
     const _send = () => {
+      const Buffer = require('buffer').Buffer
       const httpClient = require(https ? 'https' : 'http')
 
       const req = httpClient.request(options, res => {
