@@ -13,10 +13,9 @@ ExternalModule.prototype.getSourceForCommonJsExternal = function(moduleAndSpecif
     //one of these is problem with ReactNative http://support.backendless.com/topic/latest-npm-version-4-1-6-not-working-with-react-native
     return [
       'throw new Error(\'',
-      `NodeJs package "${moduleAndSpecifiers}" is not included to "dist" build. `,
-      'Do not use the file in NodeJs environment. ',
-      'You should use files from "lib" directory instead. ',
-      'If you have some problems with it or any questions please create a new support topic here http://support.backendless.com/ ',
+      'This Backendless JS SDK assembly is not intended for Node.js environment. ' +
+      'You should use "lib" folder modules instead. ' +
+      'For any questions please contact as at http://support.backendless.com/',
       '\')'
     ].join('');
   }
