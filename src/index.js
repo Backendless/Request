@@ -244,7 +244,7 @@ class Request {
   }
 
   /**
-   * @param {String} queryParams
+   * @param {Object} queryParams
    * @returns {Request}
    */
   query(queryParams) {
