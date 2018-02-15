@@ -28,6 +28,10 @@
     "name": "Backendless Corp",
     "email": "info@backendless.com"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Backendless/Request"
+  },
   "license": "MIT",
   "devDependencies": {
     "babel-cli": "^6.23.0",
