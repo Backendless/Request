@@ -7,6 +7,32 @@ backendless.js => ~ 28 KB
 backendless.min.js => ~ 11 KB
 ````
 
+- [How to use](#how-to-use)
+  - [Install](#install)
+  - [Require it as a module](#require-it-as-a-module)
+  - [Include it as a single file](#include-it-as-a-single-file)
+
+- [Request Methods](#request-methods)
+  - [GET](#get)
+  - [POST](#post)
+  - [PUT](#put)
+  - [DELETE](#delete)
+  - [PATCH](#patch)
+
+- [Query Params](#query-params)
+
+- [Request Body](#request-body)
+  - [Form](#form)
+  - [ContentType Header](#contenttype-header)
+
+- [Caching Requests](#caching-requests)
+  - [Cache Tags](#cache-tags)
+  - [Reset Cache](#reset-cache)
+
+- [Own XMLHttpRequest](#own-xmlhttprequest)
+
+- [Logging](#logging)
+
 ## How to use
 
 ### Install
@@ -133,7 +159,7 @@ BackendlessRequest.post('http://foo.bar/')
   .catch(error => console.error(error))
 ````
 
-#### ContentType Request Header
+#### ContentType Header
 For set up Content-Type header manually you can use `.type(contentTypeHeader)` method or set it via `.set('Content-Type', value)` method. 
 If you pass an object as request body the `Content-Type` header will be automatically specified as `application/json` 
 
