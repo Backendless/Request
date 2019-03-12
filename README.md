@@ -38,7 +38,7 @@ backendless.min.js => ~ 11 KB
 ### Install
 for installing just execute the following command:
 ````
-npm i backendelss-request -S
+npm i backendless-request -S
 ````
 
 ### Require it as a module 
