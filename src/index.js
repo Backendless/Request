@@ -358,7 +358,7 @@ class Request extends EventEmitter {
    * @returns {Promise}
    */
   send(body) {
-    this.emit(REQUEST_EVENT)
+    this.emit(REQUEST_EVENT, this)
 
     let path = this.path
     const queryString = qs.stringify(this.queryParams)
