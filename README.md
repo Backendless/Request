@@ -25,6 +25,8 @@ backendless.min.js => ~ 11 KB
   - [Form](#form)
   - [ContentType Header](#contenttype-header)
 
+- [Request Events](#request-events)
+
 - [Caching Requests](#caching-requests)
   - [Cache Tags](#cache-tags)
   - [Reset Cache](#reset-cache)
@@ -171,6 +173,28 @@ BackendlessRequest.get('http://foo.bar/')
   .catch(error => console.error(error))
 ````
 
+### Request Events
+A request instance might fire events to notify about changing request state:
+
+for subscribing use method `.on(<eventName>, callback)`
+
+````js
+BackendlessRequest.post('http://foo.bar/some-path')
+  .on('request', req => req.set('my-x-header-key', 'my-x-header-value')) 
+  .on('response', result => console.log('result', result)) 
+  .on('error', error => console.log('error', error))
+  .on('done', (error, result) => console.log('done', { error, result })) 
+  .send({ str: 'some-string', num: 123, bool: true, arr: [1, 2, 3, 4] })
+  .then(result => console.log(result))
+  .catch(error => console.error(error))
+````
+
+- `request` - it will be fired before sending request to the server
+- `response` - it will be fired when request is successfully completed 
+- `error` - it will be fired when request is failed
+- `done` - it will be fired when request is done, it's a shortcut for `response` and `error`
+ 
+ 
 ### Caching Requests
 The feature provides you to have some responses cached and reset the cache by the next requests.
 
