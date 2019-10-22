@@ -1,4 +1,5 @@
 import Cache from './cache'
+import EventEmitter from './event-emitter'
 import * as qs from './qs'
 import { castArray, isObject, isFormData, isStream } from './utils'
 
@@ -109,8 +110,8 @@ const sendNodeAPIRequest = (path, method, headers, body, encoding) => {
       const httpClient = require(https ? 'https' : 'http')
 
       const req = httpClient.request(options, res => {
-        const  strings =[]
-        const  buffers =[]
+        const strings = []
+        const buffers = []
         let bufferLength = 0
         let body = ''
 
@@ -196,9 +197,16 @@ function checkStatus(response) {
   return Promise.reject(responseError)
 }
 
-class Request {
+const REQUEST_EVENT = 'request'
+const RESPONSE_EVENT = 'response'
+const ERROR_EVENT = 'error'
+const DONE_EVENT = 'done'
+
+class Request extends EventEmitter {
 
   constructor(path, method, body) {
+    super()
+
     this.method = method
     this.path = path
     this.body = body
@@ -222,7 +230,7 @@ class Request {
       for (const headerName in key) {
         this.set(headerName, key[headerName])
       }
-    } else if (typeof value !== 'undefined'){
+    } else if (typeof value !== 'undefined') {
       this.headers[key] = value
     }
 
@@ -337,7 +345,7 @@ class Request {
    * @param {String} encoding
    * @returns {Request}
    */
-  setEncoding(encoding){
+  setEncoding(encoding) {
     this.encoding = encoding
 
     return this
@@ -350,6 +358,8 @@ class Request {
    * @returns {Promise}
    */
   send(body) {
+    this.emit(REQUEST_EVENT)
+
     let path = this.path
     const queryString = qs.stringify(this.queryParams)
 
@@ -407,12 +417,24 @@ class Request {
       console.log(this.method.toUpperCase(), decodeURIComponent(path), body, this.headers)
     }
 
-    return Request.send(path, this.method.toUpperCase(), this.headers, body, this.encoding)
+    const request = Request.send(path, this.method.toUpperCase(), this.headers, body, this.encoding)
       .then(parseBody)
       .then(checkStatus)
       .then(unwrapBody)
       .then(cacheResponse)
       .then(flushCache)
+
+    request
+      .then(result => {
+        this.emit(RESPONSE_EVENT, result)
+        this.emit(DONE_EVENT, null, result)
+      })
+      .catch(error => {
+        this.emit(ERROR_EVENT, error)
+        this.emit(DONE_EVENT, error)
+      })
+
+    return request
   }
 
   /**
