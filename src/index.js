@@ -9,13 +9,17 @@ const CACHE_FLUSH_INTERVAL = 60000 //60 sec
 const cache = new Cache(CACHE_FLUSH_INTERVAL)
 
 class ResponseError extends Error {
-  constructor(error, status, headers) {
+  constructor(response) {
     super()
 
-    this.status = status
-    this.headers = headers
+    const error = parseError(response)
+
     this.message = error.message || error
     this.code = error.code
+
+    this.status = response.status
+    this.headers = response.headers
+    this.body = response.body
   }
 }
 
@@ -192,9 +196,7 @@ function checkStatus(response) {
     return response
   }
 
-  const responseError = new ResponseError(parseError(response), response.status, response.headers)
-
-  return Promise.reject(responseError)
+  throw new ResponseError(response)
 }
 
 const REQUEST_EVENT = 'request'
