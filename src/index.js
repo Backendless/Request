@@ -59,9 +59,11 @@ function parseHeaders(headersString) {
   return parsed
 }
 
-const sendXmlHttpRequest = (path, method, headers, body) => {
+const sendXmlHttpRequest = (path, method, headers, body, timeout) => {
   return new Promise(function sendRequest(resolve, reject) {
     let request = new Request.XMLHttpRequest()
+
+    request.timeout = timeout
 
     request.open(method.toUpperCase(), path, true)
 
@@ -95,18 +97,19 @@ const sendXmlHttpRequest = (path, method, headers, body) => {
   })
 }
 
-const sendNodeAPIRequest = (path, method, headers, body, encoding) => {
+const sendNodeAPIRequest = (path, method, headers, body, encoding, timeout) => {
   return new Promise((resolve, reject) => {
     const u = require('url').parse(path)
     const form = isFormData(body) && body
 
     const https = u.protocol === 'https:'
     const options = {
-      host   : u.hostname,
-      port   : u.port || (https ? 443 : 80),
-      method : method,
-      path   : u.path,
-      headers: headers
+      host: u.hostname,
+      port: u.port || (https ? 443 : 80),
+      path: u.path,
+      method,
+      headers,
+      timeout,
     }
 
     const _send = () => {
@@ -150,6 +153,10 @@ const sendNodeAPIRequest = (path, method, headers, body, encoding) => {
       })
 
       req.on('error', reject)
+
+      req.on('timeout', () => {
+        req.destroy(new Error('Connection aborted due to timeout'))
+      })
 
       if (body) {
         if (isStream(body)) {
@@ -218,6 +225,7 @@ class Request extends EventEmitter {
     this.headers = {}
     this.queryParams = {}
     this.encoding = 'utf8'
+    this.timeout = 0
   }
 
   /**
@@ -354,6 +362,17 @@ class Request extends EventEmitter {
   }
 
   /**
+   * A number specifying request timeout in milliseconds.
+   * @param {Number} ms
+   * @returns {Request}
+   */
+  setTimeout(ms) {
+    this.timeout = ms
+
+    return this
+  }
+
+  /**
    * Sends the requst
    *
    * @param {Object} body
@@ -419,7 +438,7 @@ class Request extends EventEmitter {
       console.log(this.method.toUpperCase(), decodeURIComponent(path), body, this.headers)
     }
 
-    const request = Request.send(path, this.method.toUpperCase(), this.headers, body, this.encoding)
+    const request = Request.send(path, this.method.toUpperCase(), this.headers, body, this.encoding, this.timeout)
       .then(parseBody)
       .then(checkStatus)
       .then(unwrapBody)
@@ -471,12 +490,12 @@ Object.defineProperty(Request, 'FormData', {
 
 Request.XMLHttpRequest = typeof XMLHttpRequest !== 'undefined' ? XMLHttpRequest : undefined
 
-Request.send = (path, method, headers, body, encoding) => {
-  const sender = typeof Request.XMLHttpRequest !== 'undefined'
+Request.send = (path, method, headers, body, encoding, timeout) => {
+  const sender = Request.XMLHttpRequest
     ? sendXmlHttpRequest
     : sendNodeAPIRequest
 
-  return sender(path, method, headers, body, encoding)
+  return sender(path, method, headers, body, encoding, timeout)
 }
 
 Request.verbose = false
