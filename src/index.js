@@ -491,7 +491,7 @@ Object.defineProperty(Request, 'FormData', {
 Request.XMLHttpRequest = typeof XMLHttpRequest !== 'undefined' ? XMLHttpRequest : undefined
 
 Request.send = (path, method, headers, body, encoding, timeout) => {
-  const sender = Request.XMLHttpRequest
+  const sender = typeof Request.XMLHttpRequest !== 'undefined'
     ? sendXmlHttpRequest
     : sendNodeAPIRequest
 
