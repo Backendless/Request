@@ -59,20 +59,31 @@ function parseHeaders(headersString) {
   return parsed
 }
 
-const sendXmlHttpRequest = (path, method, headers, body, timeout) => {
+const sendXmlHttpRequest = (path, method, headers, body, encoding, timeout) => {
   return new Promise(function sendRequest(resolve, reject) {
     let request = new Request.XMLHttpRequest()
 
     request.timeout = timeout
 
+    if (!encoding) {
+      request.responseType = 'arraybuffer'
+    }
+
     request.open(method.toUpperCase(), path, true)
 
     request.onload = function handleLoadEvent() {
       const headers = parseHeaders(request.getAllResponseHeaders())
-      const { status, statusText, response, responseText } = request
-      const body = response || responseText
+      const { status, statusText } = request
 
-      resolve({ status, statusText, headers, body })
+      const result = { status, statusText, headers }
+
+      if (encoding === 'utf8') {
+        result.body = request.response || request.responseText
+      } else if (request.response) {
+        result.body = new Uint8Array(request.response)
+      }
+
+      resolve(result)
 
       request = null
     }
