@@ -117,7 +117,7 @@ const sendNodeAPIRequest = (path, method, headers, body, encoding, timeout) => {
     const options = {
       host: u.hostname,
       port: u.port || (https ? 443 : 80),
-      path: u.path,
+      path: encodeURI(decodeURI(u.pathname)) + (u.search || ''),
       method,
       headers,
       timeout,
@@ -398,8 +398,6 @@ class Request extends EventEmitter {
     if (queryString) {
       path += '?' + queryString
     }
-
-    path = encodeURI(decodeURI(path))
 
     if (this.cacheTTL) {
       const cached = cache.get(path)
