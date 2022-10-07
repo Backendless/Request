@@ -1,6 +1,6 @@
 {
   "name": "backendless-request",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Simple Node.js and browser REST client",
   "browser": "dist/backendless-request.js",
   "main": "lib/index.js",
@@ -43,7 +43,7 @@
     "cross-env": "^3.1.4",
     "eslint": "^3.16.0",
     "imports-loader": "^0.7.1",
-    "rimraf": "^2.6.0",
+    "rimraf": "^3.0.2",
     "webpack": "^3.8.1"
   },
   "dependencies": {
