@@ -399,6 +399,8 @@ class Request extends EventEmitter {
       path += '?' + queryString
     }
 
+    path = encodeURI(decodeURI(path))
+
     if (this.cacheTTL) {
       const cached = cache.get(path)
 
