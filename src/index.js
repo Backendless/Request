@@ -4,7 +4,7 @@ import * as qs from './qs'
 import { castArray, isObject, isFormData, isStream } from './utils'
 
 const CONTENT_TYPE_HEADER = 'Content-Type'
-const CACHE_FLUSH_INTERVAL = 600 //60 sec
+const CACHE_FLUSH_INTERVAL = 60000 //60 sec
 
 const cache = new Cache(CACHE_FLUSH_INTERVAL)
 
