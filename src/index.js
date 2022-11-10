@@ -4,7 +4,7 @@ import * as qs from './qs'
 import { castArray, isObject, isFormData, isStream } from './utils'
 
 const CONTENT_TYPE_HEADER = 'Content-Type'
-const CACHE_FLUSH_INTERVAL = 60000 //60 sec
+const CACHE_FLUSH_INTERVAL = 600 //60 sec
 
 const cache = new Cache(CACHE_FLUSH_INTERVAL)
 
@@ -108,6 +108,10 @@ const sendXmlHttpRequest = (path, method, headers, body, encoding, timeout) => {
   })
 }
 
+function encodePathname(pathname) {
+  return pathname.split('/').map(v => encodeURIComponent(decodeURIComponent(v))).join('/')
+}
+
 const sendNodeAPIRequest = (path, method, headers, body, encoding, timeout) => {
   return new Promise((resolve, reject) => {
     const u = require('url').parse(path)
@@ -117,7 +121,7 @@ const sendNodeAPIRequest = (path, method, headers, body, encoding, timeout) => {
     const options = {
       host: u.hostname,
       port: u.port || (https ? 443 : 80),
-      path: encodeURI(decodeURI(u.pathname)) + (u.search || ''),
+      path: encodePathname(u.pathname) + (u.search || ''),
       method,
       headers,
       timeout,
@@ -508,6 +512,12 @@ Request.send = (path, method, headers, body, encoding, timeout) => {
 
   return sender(path, method, headers, body, encoding, timeout)
 }
+
+Request.resetAllCache = () => {
+  cache.deleteAll()
+}
+
+Request.__cache = cache
 
 Request.verbose = false
 Request.methods = ['get', 'post', 'put', 'patch', 'delete']
