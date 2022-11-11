@@ -54,7 +54,7 @@ const tagsContainMatches = (a, b) => {
  * Makes it possible to assign multiple tags for a key and delete keys by tags
  * Optionally it starts flushing timer which cleans all outdated keys
  */
-export default class Cache {
+class Cache {
 
   /**
    * @param {Number?} flushInterval
@@ -148,3 +148,8 @@ export default class Cache {
     }
   }
 }
+
+const CACHE_FLUSH_INTERVAL = 60000 //60 sec
+
+export const cache = new Cache(CACHE_FLUSH_INTERVAL)
+

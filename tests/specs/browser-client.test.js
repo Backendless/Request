@@ -2,13 +2,14 @@ import { Buffer } from 'buffer'
 import FormData from 'form-data'
 
 import Request from '../../src'
+import { cache } from '../../src/cache'
 
 import { registerBrowserTransaction, wait } from '../helpers'
 
 describe('Browser Client', () => {
 
   afterEach(() => {
-    Request.resetAllCache()
+    cache.deleteAll()
   })
 
   describe('Request Options', () => {
@@ -871,8 +872,8 @@ describe('Browser Client', () => {
     })
 
     it('resets all caches by ttl', async () => {
-      const oldFlushInterval = Request.__cache.flushInterval
-      Request.__cache.setFlushInterval(500)
+      const oldFlushInterval = cache.flushInterval
+      cache.setFlushInterval(500)
 
       registerBrowserTransaction('result1')
       registerBrowserTransaction('result2')
@@ -890,7 +891,7 @@ describe('Browser Client', () => {
       expect(result1).toBe('result1')
       expect(result2).toBe('result2')
 
-      Request.__cache.setFlushInterval(oldFlushInterval)
+      cache.setFlushInterval(oldFlushInterval)
     })
 
     it('resets cache by POST request', async () => {
