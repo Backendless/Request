@@ -9,7 +9,7 @@ export function sendNodeAPIRequest(path, method, headers, body, encoding, timeou
     const options = {
       host: u.hostname,
       port: u.port || (https ? 443 : 80),
-      path: encodePathname(u.pathname) + (u.search || ''),
+      path: u.pathname + (u.search || ''),
       method,
       headers,
       timeout,
@@ -95,5 +95,6 @@ export function sendNodeAPIRequest(path, method, headers, body, encoding, timeou
 }
 
 function encodePathname(pathname) {
-  return pathname.split('/').map(v => encodeURIComponent(decodeURIComponent(v))).join('/')
+  // return pathname
+  return encodeURI(decodeURI(pathname))
 }

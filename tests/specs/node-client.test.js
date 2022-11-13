@@ -134,6 +134,21 @@ describe('Node Client', () => {
       expect(transaction1.options.path).toEqual('/path/%40/%20/%D0%B0%D0%B1%D0%B2/')
       expect(transaction2.options.path).toEqual('/path/%40/%20/%D0%B0%D0%B1%D0%B2/')
     })
+
+    it('specific case #1', async () => {
+      const transaction = registerNodeTransaction(null)
+
+      await Request.get('https://docs.googleapis.com/v1/documents/10psXGc-EW3vkeGXP0qG3v66Q-uo:batchUpdate')
+
+      expect(transaction.options).toEqual({
+        'headers': {},
+        'host'   : 'docs.googleapis.com',
+        'method' : 'GET',
+        'path'   : '/v1/documents/10psXGc-EW3vkeGXP0qG3v66Q-uo:batchUpdate',
+        'port'   : 443,
+        'timeout': 0
+      })
+    })
   })
 
   describe('Request Query', () => {
