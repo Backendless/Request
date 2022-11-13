@@ -108,10 +108,6 @@ const sendXmlHttpRequest = (path, method, headers, body, encoding, timeout) => {
   })
 }
 
-function encodePathname(pathname) {
-  return pathname.split('/').map(v => encodeURIComponent(decodeURIComponent(v))).join('/')
-}
-
 const sendNodeAPIRequest = (path, method, headers, body, encoding, timeout) => {
   return new Promise((resolve, reject) => {
     const u = require('url').parse(path)
@@ -121,7 +117,7 @@ const sendNodeAPIRequest = (path, method, headers, body, encoding, timeout) => {
     const options = {
       host: u.hostname,
       port: u.port || (https ? 443 : 80),
-      path: encodePathname(u.pathname) + (u.search || ''),
+      path: u.pathname + (u.search || ''),
       method,
       headers,
       timeout,
