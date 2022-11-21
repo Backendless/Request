@@ -131,7 +131,7 @@ describe('Node Client', () => {
       await Request.get('http://foo.bar/path/@/ /абв/')
       await Request.get('http://foo.bar/path/%40/%20/%D0%B0%D0%B1%D0%B2/')
 
-      expect(transaction1.options.path).toEqual('/path/%40/%20/%D0%B0%D0%B1%D0%B2/')
+      expect(transaction1.options.path).toEqual('/path/@/%20/абв/')
       expect(transaction2.options.path).toEqual('/path/%40/%20/%D0%B0%D0%B1%D0%B2/')
     })
 
