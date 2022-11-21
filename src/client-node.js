@@ -93,8 +93,3 @@ export function sendNodeAPIRequest(path, method, headers, body, encoding, timeou
     }
   })
 }
-
-function encodePathname(pathname) {
-  // return pathname
-  return encodeURI(decodeURI(pathname))
-}
