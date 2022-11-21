@@ -27,4 +27,4 @@ Request.methods.forEach(method => {
   }
 })
 
-module.exports = Request
+export default Request
