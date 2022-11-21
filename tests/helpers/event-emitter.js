@@ -1,5 +1,4 @@
-export default class EventEmitter {
-
+export class EventEmitter {
   constructor() {
     this.events = {}
   }
@@ -31,4 +30,5 @@ export default class EventEmitter {
       this.events[eventName].forEach(callback => callback(...args))
     }
   }
+
 }

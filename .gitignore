@@ -13,3 +13,4 @@ es
 .idea/dictionaries
 /.idea/jsLinters/
 /.idea/codeStyles/
+/coverage/
