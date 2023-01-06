@@ -27,4 +27,6 @@ Request.methods.forEach(method => {
   }
 })
 
+exports = module.exports = Request
+
 export default Request
