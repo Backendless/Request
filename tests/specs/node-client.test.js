@@ -21,7 +21,13 @@ describe('Node Client', () => {
       expect(result).toEqual({ foo: 123 })
 
       expect(transaction.options).toEqual({
-        'headers': {}, 'host': 'foo.bar', 'method': 'GET', 'path': '/path/to/api', 'port': '9898', 'timeout': 0
+        'headers'        : {},
+        'host'           : 'foo.bar',
+        'method'         : 'GET',
+        'path'           : '/path/to/api',
+        'port'           : '9898',
+        'timeout'        : 0,
+        'withCredentials': true,
       })
     })
 
@@ -33,7 +39,13 @@ describe('Node Client', () => {
       expect(result).toEqual({ foo: 123 })
 
       expect(transaction.options).toEqual({
-        'headers': {}, 'host': null, 'method': 'GET', 'path': 'foo.bar/path/to/api', 'port': 80, 'timeout': 0
+        'headers'        : {},
+        'host'           : null,
+        'method'         : 'GET',
+        'path'           : 'foo.bar/path/to/api',
+        'port'           : 80,
+        'timeout'        : 0,
+        'withCredentials': true
       })
     })
 
@@ -45,7 +57,13 @@ describe('Node Client', () => {
       expect(result).toEqual({ foo: 123 })
 
       expect(transaction.options).toEqual({
-        'headers': {}, 'host': 'foo.bar', 'method': 'GET', 'path': '/path/to/api', 'port': 80, 'timeout': 0
+        'headers'        : {},
+        'host'           : 'foo.bar',
+        'method'         : 'GET',
+        'path'           : '/path/to/api',
+        'port'           : 80,
+        'timeout'        : 0,
+        'withCredentials': true
       })
     })
 
@@ -57,7 +75,13 @@ describe('Node Client', () => {
       expect(result).toEqual({ foo: 123 })
 
       expect(transaction.options).toEqual({
-        'headers': {}, 'host': 'foo.bar', 'method': 'GET', 'path': '/path/to/api', 'port': 443, 'timeout': 0
+        'headers'        : {},
+        'host'           : 'foo.bar',
+        'method'         : 'GET',
+        'path'           : '/path/to/api',
+        'port'           : 443,
+        'timeout'        : 0,
+        'withCredentials': true
       })
     })
 
@@ -71,7 +95,13 @@ describe('Node Client', () => {
       expect(result).toEqual({ foo: 123 })
 
       expect(transaction.options).toEqual({
-        'headers': {}, 'host': 'foo.bar', 'method': 'GET', 'path': '/path/to/api', 'port': '9898', 'timeout': 0
+        'headers'        : {},
+        'host'           : 'foo.bar',
+        'method'         : 'GET',
+        'path'           : '/path/to/api',
+        'port'           : '9898',
+        'timeout'        : 0,
+        'withCredentials': true
       })
     })
 
@@ -83,7 +113,13 @@ describe('Node Client', () => {
       expect(result).toEqual('invalid json')
 
       expect(transaction.options).toEqual({
-        'headers': {}, 'host': 'foo.bar', 'method': 'GET', 'path': '/path/to/api', 'port': '9898', 'timeout': 0
+        'headers'        : {},
+        'host'           : 'foo.bar',
+        'method'         : 'GET',
+        'path'           : '/path/to/api',
+        'port'           : '9898',
+        'timeout'        : 0,
+        'withCredentials': true
       })
     })
 
@@ -141,12 +177,13 @@ describe('Node Client', () => {
       await Request.get('https://docs.googleapis.com/v1/documents/10psXGc-EW3vkeGXP0qG3v66Q-uo:batchUpdate')
 
       expect(transaction.options).toEqual({
-        'headers': {},
-        'host'   : 'docs.googleapis.com',
-        'method' : 'GET',
-        'path'   : '/v1/documents/10psXGc-EW3vkeGXP0qG3v66Q-uo:batchUpdate',
-        'port'   : 443,
-        'timeout': 0
+        'headers'        : {},
+        'host'           : 'docs.googleapis.com',
+        'method'         : 'GET',
+        'path'           : '/v1/documents/10psXGc-EW3vkeGXP0qG3v66Q-uo:batchUpdate',
+        'port'           : 443,
+        'timeout'        : 0,
+        'withCredentials': true
       })
     })
   })
@@ -161,12 +198,13 @@ describe('Node Client', () => {
         })
 
       expect(transaction.options).toEqual({
-        'headers': {},
-        'host'   : 'foo.bar',
-        'method' : 'GET',
-        'path'   : '/path/to/api?str=str&num1=0&num2=123&bool1=true&bool2=false',
-        'port'   : '9898',
-        'timeout': 0
+        'headers'        : {},
+        'host'           : 'foo.bar',
+        'method'         : 'GET',
+        'path'           : '/path/to/api?str=str&num1=0&num2=123&bool1=true&bool2=false',
+        'port'           : '9898',
+        'timeout'        : 0,
+        'withCredentials': true
       })
     })
 
@@ -179,12 +217,13 @@ describe('Node Client', () => {
         })
 
       expect(transaction.options).toEqual({
-        'headers': {},
-        'host'   : 'foo.bar',
-        'method' : 'GET',
-        'path'   : '/path/to/api?numArr=1&numArr=2&numArr=3&strArr=a&strArr=b&strArr=c',
-        'port'   : '9898',
-        'timeout': 0
+        'headers'        : {},
+        'host'           : 'foo.bar',
+        'method'         : 'GET',
+        'path'           : '/path/to/api?numArr=1&numArr=2&numArr=3&strArr=a&strArr=b&strArr=c',
+        'port'           : '9898',
+        'timeout'        : 0,
+        'withCredentials': true
       })
     })
 
@@ -197,12 +236,13 @@ describe('Node Client', () => {
         })
 
       expect(transaction.options).toEqual({
-        'headers': {},
-        'host'   : 'foo.bar',
-        'method' : 'GET',
-        'path'   : '/path/to/api?str=%D0%B0%D0%B1%D0%B2&space=%20&percent=%25&at=%40&strArr=%D0%B0%D0%B1%D0%B2&strArr=%20&strArr=%25&strArr=%40',
-        'port'   : '9898',
-        'timeout': 0
+        'headers'        : {},
+        'host'           : 'foo.bar',
+        'method'         : 'GET',
+        'path'           : '/path/to/api?str=%D0%B0%D0%B1%D0%B2&space=%20&percent=%25&at=%40&strArr=%D0%B0%D0%B1%D0%B2&strArr=%20&strArr=%25&strArr=%40',
+        'port'           : '9898',
+        'timeout'        : 0,
+        'withCredentials': true
       })
     })
   })
@@ -218,9 +258,13 @@ describe('Node Client', () => {
         .set('header4', 'value4')
 
       expect(transaction.options).toEqual({
-        'headers': {
-          'header1': 'value1', 'header2': 'value3', 'header3': 'value3', 'header4': 'value4'
-        }, 'host': 'foo.bar', 'method': 'GET', 'path': '/path/to/api', 'port': '9898', 'timeout': 0
+        'headers'        : { 'header1': 'value1', 'header2': 'value3', 'header3': 'value3', 'header4': 'value4' },
+        'host'           : 'foo.bar',
+        'method'         : 'GET',
+        'path'           : '/path/to/api',
+        'port'           : '9898',
+        'timeout'        : 0,
+        'withCredentials': true
       })
     })
   })
@@ -233,9 +277,15 @@ describe('Node Client', () => {
         .type('application/pdf')
 
       expect(transaction.options).toEqual({
-        'headers': {
+        'headers'        : {
           'Content-Type': 'application/pdf',
-        }, 'host': 'foo.bar', 'method': 'GET', 'path': '/path/to/api', 'port': '9898', 'timeout': 0
+        },
+        'host'           : 'foo.bar',
+        'method'         : 'GET',
+        'path'           : '/path/to/api',
+        'port'           : '9898',
+        'timeout'        : 0,
+        'withCredentials': true
       })
     })
 
@@ -248,16 +298,28 @@ describe('Node Client', () => {
 
       expect(transaction1.requestBody).toEqual('{"prop":"test"}')
       expect(transaction1.options).toEqual({
-        'headers': {
+        'headers'        : {
           'Content-Type': 'application/json', 'content-length': 15
-        }, 'host': 'foo.bar', 'method': 'POST', 'path': '/path/to/api', 'port': '9898', 'timeout': 0
+        },
+        'host'           : 'foo.bar',
+        'method'         : 'POST',
+        'path'           : '/path/to/api',
+        'port'           : '9898',
+        'timeout'        : 0,
+        'withCredentials': true
       })
 
       expect(transaction2.requestBody).toEqual('[1,2,3]')
       expect(transaction2.options).toEqual({
-        'headers': {
+        'headers'        : {
           'Content-Type': 'application/json', 'content-length': 7
-        }, 'host': 'foo.bar', 'method': 'POST', 'path': '/path/to/api', 'port': '9898', 'timeout': 0
+        },
+        'host'           : 'foo.bar',
+        'method'         : 'POST',
+        'path'           : '/path/to/api',
+        'port'           : '9898',
+        'timeout'        : 0,
+        'withCredentials': true
       })
     })
 
@@ -269,9 +331,15 @@ describe('Node Client', () => {
 
       expect(transaction.requestBody).toEqual('{"prop":"test"}')
       expect(transaction.options).toEqual({
-        'headers': {
+        'headers'        : {
           'Content-Type': 'application/json', 'content-length': 15
-        }, 'host': 'foo.bar', 'method': 'POST', 'path': '/path/to/api', 'port': '9898', 'timeout': 0
+        },
+        'host'           : 'foo.bar',
+        'method'         : 'POST',
+        'path'           : '/path/to/api',
+        'port'           : '9898',
+        'timeout'        : 0,
+        'withCredentials': true
       })
 
     })
@@ -301,9 +369,15 @@ describe('Node Client', () => {
       expect(transaction.requestForm).toBeInstanceOf(FormData)
 
       expect(transaction.options).toEqual({
-        'headers': {
+        'headers'        : {
           'content-length': 579, 'content-type': `multipart/form-data; boundary=${transaction.requestForm._boundary}`
-        }, 'host': 'foo.bar', 'method': 'POST', 'path': '/path/to/api', 'port': '9898', 'timeout': 0
+        },
+        'host'           : 'foo.bar',
+        'method'         : 'POST',
+        'path'           : '/path/to/api',
+        'port'           : '9898',
+        'timeout'        : 0,
+        'withCredentials': true
       })
     })
 
@@ -318,9 +392,15 @@ describe('Node Client', () => {
       expect(transaction.requestForm).toBeInstanceOf(FormData)
 
       expect(transaction.options).toEqual({
-        'headers': {
+        'headers'        : {
           'content-length': 680, 'content-type': `multipart/form-data; boundary=${transaction.requestForm._boundary}`
-        }, 'host': 'foo.bar', 'method': 'POST', 'path': '/path/to/api', 'port': '9898', 'timeout': 0
+        },
+        'host'           : 'foo.bar',
+        'method'         : 'POST',
+        'path'           : '/path/to/api',
+        'port'           : '9898',
+        'timeout'        : 0,
+        'withCredentials': true
       })
     })
 
@@ -341,9 +421,15 @@ describe('Node Client', () => {
       expect(transaction.requestForm).toBeInstanceOf(FormData)
 
       expect(transaction.options).toEqual({
-        'headers': {
+        'headers'        : {
           'content-length': 578, 'content-type': `multipart/form-data; boundary=${transaction.requestForm._boundary}`
-        }, 'host': 'foo.bar', 'method': 'POST', 'path': '/path/to/api', 'port': '9898', 'timeout': 0
+        },
+        'host'           : 'foo.bar',
+        'method'         : 'POST',
+        'path'           : '/path/to/api',
+        'port'           : '9898',
+        'timeout'        : 0,
+        'withCredentials': true
       })
     })
   })
@@ -356,7 +442,13 @@ describe('Node Client', () => {
         .setTimeout(1200)
 
       expect(transaction.options).toEqual({
-        'headers': {}, 'host': 'foo.bar', 'method': 'GET', 'path': '/path/to/api', 'port': '9898', 'timeout': 1200
+        'headers'        : {},
+        'host'           : 'foo.bar',
+        'method'         : 'GET',
+        'path'           : '/path/to/api',
+        'port'           : '9898',
+        'timeout'        : 1200,
+        'withCredentials': true
       })
     })
   })
@@ -368,7 +460,13 @@ describe('Node Client', () => {
       await Request.get('http://foo.bar:9898/path/to/api')
 
       expect(transaction.options).toEqual({
-        'headers': {}, 'host': 'foo.bar', 'method': 'GET', 'path': '/path/to/api', 'port': '9898', 'timeout': 0
+        'headers'        : {},
+        'host'           : 'foo.bar',
+        'method'         : 'GET',
+        'path'           : '/path/to/api',
+        'port'           : '9898',
+        'timeout'        : 0,
+        'withCredentials': true
       })
     })
 
@@ -379,9 +477,15 @@ describe('Node Client', () => {
 
       expect(transaction.requestBody).toEqual('{"prop":123}')
       expect(transaction.options).toEqual({
-        'headers': {
+        'headers'        : {
           'Content-Type': 'application/json', 'content-length': 12
-        }, 'host': 'foo.bar', 'method': 'POST', 'path': '/path/to/api', 'port': '9898', 'timeout': 0
+        },
+        'host'           : 'foo.bar',
+        'method'         : 'POST',
+        'path'           : '/path/to/api',
+        'port'           : '9898',
+        'timeout'        : 0,
+        'withCredentials': true
       })
     })
 
@@ -392,9 +496,15 @@ describe('Node Client', () => {
 
       expect(transaction.requestBody).toEqual('{"prop":123}')
       expect(transaction.options).toEqual({
-        'headers': {
+        'headers'        : {
           'Content-Type': 'application/json', 'content-length': 12
-        }, 'host': 'foo.bar', 'method': 'PUT', 'path': '/path/to/api', 'port': '9898', 'timeout': 0
+        },
+        'host'           : 'foo.bar',
+        'method'         : 'PUT',
+        'path'           : '/path/to/api',
+        'port'           : '9898',
+        'timeout'        : 0,
+        'withCredentials': true
       })
     })
 
@@ -405,9 +515,15 @@ describe('Node Client', () => {
 
       expect(transaction.requestBody).toEqual('{"prop":123}')
       expect(transaction.options).toEqual({
-        'headers': {
+        'headers'        : {
           'Content-Type': 'application/json', 'content-length': 12
-        }, 'host': 'foo.bar', 'method': 'DELETE', 'path': '/path/to/api', 'port': '9898', 'timeout': 0
+        },
+        'host'           : 'foo.bar',
+        'method'         : 'DELETE',
+        'path'           : '/path/to/api',
+        'port'           : '9898',
+        'timeout'        : 0,
+        'withCredentials': true
       })
     })
   })
@@ -525,7 +641,13 @@ describe('Node Client', () => {
       expect(result).toEqual({ foo: 123, str: 'hello' })
 
       expect(transaction.options).toEqual({
-        'headers': {}, 'host': 'foo.bar', 'method': 'GET', 'path': '/path/to/api', 'port': '9898', 'timeout': 0
+        'headers'        : {},
+        'host'           : 'foo.bar',
+        'method'         : 'GET',
+        'path'           : '/path/to/api',
+        'port'           : '9898',
+        'timeout'        : 0,
+        'withCredentials': true
       })
 
     })
@@ -542,7 +664,13 @@ describe('Node Client', () => {
       expect(result.toString('utf8')).toEqual('hello world')
 
       expect(transaction.options).toEqual({
-        'headers': {}, 'host': 'foo.bar', 'method': 'GET', 'path': '/path/to/api', 'port': '9898', 'timeout': 0
+        'headers'        : {},
+        'host'           : 'foo.bar',
+        'method'         : 'GET',
+        'path'           : '/path/to/api',
+        'port'           : '9898',
+        'timeout'        : 0,
+        'withCredentials': true
       })
 
     })
@@ -560,7 +688,13 @@ describe('Node Client', () => {
       })
 
       expect(transaction.options).toEqual({
-        'headers': {}, 'host': 'foo.bar', 'method': 'GET', 'path': '/path/to/api', 'port': '9898', 'timeout': 0
+        'headers'        : {},
+        'host'           : 'foo.bar',
+        'method'         : 'GET',
+        'path'           : '/path/to/api',
+        'port'           : '9898',
+        'timeout'        : 0,
+        'withCredentials': true
       })
 
     })
@@ -587,7 +721,13 @@ describe('Node Client', () => {
       })
 
       expect(transaction.options).toEqual({
-        'headers': {}, 'host': 'foo.bar', 'method': 'GET', 'path': '/path/to/api', 'port': '9898', 'timeout': 0
+        'headers'        : {},
+        'host'           : 'foo.bar',
+        'method'         : 'GET',
+        'path'           : '/path/to/api',
+        'port'           : '9898',
+        'timeout'        : 0,
+        'withCredentials': true
       })
 
     })
