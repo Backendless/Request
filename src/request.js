@@ -26,6 +26,7 @@ export class Request extends EventEmitter {
     this.queryParams = {}
     this.encoding = 'utf8'
     this.timeout = 0
+    this.withCredentials = null
   }
 
   /**
@@ -162,6 +163,18 @@ export class Request extends EventEmitter {
   }
 
   /**
+   * set withCredentials option
+   *
+   * @param {Boolean} value
+   * @returns {Request}
+   */
+  setWithCredentials(value) {
+    this.withCredentials = value
+
+    return this
+  }
+
+  /**
    * A number specifying request timeout in milliseconds.
    * @param {Number} ms
    * @returns {Request}
@@ -238,7 +251,19 @@ export class Request extends EventEmitter {
       console.log(this.method.toUpperCase(), decodeURIComponent(path), body, this.headers)
     }
 
-    const request = Request.send(path, this.method.toUpperCase(), this.headers, body, this.encoding, this.timeout)
+    const withCredentials = typeof this.withCredentials === 'boolean'
+      ? this.withCredentials
+      : Request.withCredentials
+
+    const request = Request.send(
+      path,
+      this.method.toUpperCase(),
+      this.headers,
+      body,
+      this.encoding,
+      this.timeout,
+      withCredentials
+    )
       .then(parseBody)
       .then(checkStatus)
       .then(unwrapBody)

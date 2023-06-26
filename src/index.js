@@ -19,6 +19,7 @@ Request.send = (path, method, headers, body, encoding, timeout) => {
 }
 
 Request.verbose = false
+Request.withCredentials = true
 
 Request.methods = ['get', 'post', 'put', 'patch', 'delete']
 Request.methods.forEach(method => {

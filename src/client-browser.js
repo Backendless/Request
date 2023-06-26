@@ -1,8 +1,12 @@
 import { Request } from './request'
 
-export function sendXmlHttpRequest(path, method, headers, body, encoding, timeout) {
+export function sendXmlHttpRequest(path, method, headers, body, encoding, timeout, withCredentials) {
   return new Promise(function sendRequest(resolve, reject) {
     let request = new Request.XMLHttpRequest()
+
+    if (typeof withCredentials === 'boolean') {
+      request.withCredentials = withCredentials
+    }
 
     request.timeout = timeout
 
