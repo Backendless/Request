@@ -4,10 +4,6 @@ export function sendXmlHttpRequest(path, method, headers, body, encoding, timeou
   return new Promise(function sendRequest(resolve, reject) {
     let request = new Request.XMLHttpRequest()
 
-    if (typeof withCredentials === 'boolean') {
-      request.withCredentials = withCredentials
-    }
-
     request.timeout = timeout
 
     if (!encoding) {
@@ -15,6 +11,10 @@ export function sendXmlHttpRequest(path, method, headers, body, encoding, timeou
     }
 
     request.open(method.toUpperCase(), path, true)
+
+    if (typeof withCredentials === 'boolean') {
+      request.withCredentials = withCredentials
+    }
 
     request.onload = function handleLoadEvent() {
       const headers = parseHeaders(request.getAllResponseHeaders())

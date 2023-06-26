@@ -10,12 +10,12 @@ Object.defineProperty(Request, 'FormData', {
 
 Request.XMLHttpRequest = typeof XMLHttpRequest !== 'undefined' ? XMLHttpRequest : undefined
 
-Request.send = (path, method, headers, body, encoding, timeout) => {
+Request.send = (path, method, headers, body, encoding, timeout, withCredentials) => {
   const sender = typeof Request.XMLHttpRequest !== 'undefined'
     ? sendXmlHttpRequest
     : sendNodeAPIRequest
 
-  return sender(path, method, headers, body, encoding, timeout)
+  return sender(path, method, headers, body, encoding, timeout, withCredentials)
 }
 
 Request.verbose = false

@@ -1,6 +1,6 @@
 import { isFormData, isStream } from './utils'
 
-export function sendNodeAPIRequest(path, method, headers, body, encoding, timeout,withCredentials) {
+export function sendNodeAPIRequest(path, method, headers, body, encoding, timeout, withCredentials) {
   return new Promise((resolve, reject) => {
     const u = require('url').parse(path)
     const form = isFormData(body) && body
