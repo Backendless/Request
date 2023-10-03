@@ -5,6 +5,18 @@ import Request from '../../src'
 import { cache } from '../../src/cache'
 
 import { registerNodeTransaction, wait } from '../helpers'
+import { isBrowser, isNodeJS } from '../../src/utils'
+
+jest.mock('../../src/utils', () => {
+  const originalModule = jest.requireActual('../../src/utils')
+
+  return {
+    __esModule: true,
+    ...originalModule,
+    isNodeJS : jest.fn(() => true),
+    isBrowser: jest.fn(() => false),
+  }
+})
 
 describe('Node Client', () => {
 
@@ -346,16 +358,30 @@ describe('Node Client', () => {
   })
 
   describe('Request Form', () => {
-    it('gets FormData from the global scope', async () => {
+    it('does not get FormData from the global scope for NodeJS', async () => {
       global.FormData = 123
 
-      expect(Request.FormData).toBe(123)
+      expect(Request.FormData).toBe(require('form-data'))
 
       delete global.FormData
     })
 
+    it('uses Custom FormData', async () => {
+      Request.FormData = 123
+      expect(Request.FormData).toBe(123)
+      Request.FormData = null
+      expect(Request.FormData).toBe(require('form-data'))
+
+      Request.FormData = 123
+      expect(Request.FormData).toBe(123)
+      expect(() => delete Request.FormData).toThrow('Cannot delete property \'FormData\' of function Request')
+      expect(Request.FormData).toBe(123)
+
+      Request.FormData = null
+    })
+
     it('gets FormData from the node_modules', async () => {
-      expect(Request.FormData).toBe(FormData)
+      expect(Request.FormData).toBe(require('form-data'))
     })
 
     it('adds primitive form properties', async () => {
@@ -1112,6 +1138,17 @@ describe('Node Client', () => {
       expect(listener3.mock.calls).toHaveLength(0)
       expect(listener4.mock.calls).toHaveLength(0)
     })
+  })
+
+  describe('Utils', () => {
+
+    it('determines running env', async () => {
+      expect({ isBrowser: isBrowser(), isNodeJS: isNodeJS() }).toEqual({
+        isBrowser: false,
+        isNodeJS : true
+      })
+    })
+
   })
 
 })

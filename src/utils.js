@@ -17,3 +17,11 @@ export const isStream = value => {
 
   return value instanceof stream.Stream
 }
+
+export const isNodeJS = () => {
+  return typeof process !== 'undefined' && process.versions != null && process.versions.node != null
+}
+
+export const isBrowser = () => {
+  return typeof window !== 'undefined' && typeof window.document !== 'undefined'
+}

@@ -3,8 +3,20 @@ import FormData from 'form-data'
 
 import Request from '../../src'
 import { cache } from '../../src/cache'
+import { isBrowser, isNodeJS } from '../../src/utils'
 
 import { registerBrowserTransaction, wait } from '../helpers'
+
+jest.mock('../../src/utils', () => {
+  const originalModule = jest.requireActual('../../src/utils')
+
+  return {
+    __esModule: true,
+    ...originalModule,
+    isNodeJS : jest.fn(() => false),
+    isBrowser: jest.fn(() => true),
+  }
+})
 
 describe('Browser Client', () => {
 
@@ -1098,6 +1110,27 @@ describe('Browser Client', () => {
       expect(listener3.mock.calls).toHaveLength(0)
       expect(listener4.mock.calls).toHaveLength(0)
     })
+  })
+
+  describe('Utils', () => {
+
+    it('determines running env', async () => {
+      global.window = { document: 'test' }
+
+      const process = global.process
+
+      delete global.process
+
+      expect({ isBrowser: isBrowser(), isNodeJS: isNodeJS() }).toEqual({
+        isBrowser: true,
+        isNodeJS : false
+      })
+
+      delete global.window
+
+      global.process = process
+    })
+
   })
 
 })
