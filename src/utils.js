@@ -9,6 +9,16 @@ export const castArray = value => {
 export const isObject = value => null != value && typeof value === 'object'
 
 export const isFormData = value => {
+  if (!value) {
+    return false
+  }
+
+  const FormData = getFormData()
+
+  if (value instanceof FormData) {
+    return true
+  }
+
   return value && value.constructor && value.constructor.toString().trim().indexOf('function FormData') === 0
 }
 
@@ -25,3 +35,20 @@ export const isNodeJS = () => {
 export const isBrowser = () => {
   return typeof window !== 'undefined' && typeof window.document !== 'undefined'
 }
+
+let CustomFormData = null
+
+export function getFormData() {
+  if (CustomFormData) {
+    return CustomFormData
+  }
+
+  return isNodeJS() || typeof FormData === 'undefined'
+    ? require('form-data')
+    : FormData
+}
+
+export function setFormData(value) {
+  CustomFormData = value
+}
+

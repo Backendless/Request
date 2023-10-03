@@ -1,23 +1,15 @@
 import { sendNodeAPIRequest } from './client-node'
 import { sendXmlHttpRequest } from './client-browser'
 import { Request } from './request'
-import { isNodeJS } from './utils'
-
-let CustomFormData = null
+import { getFormData, setFormData } from './utils'
 
 Object.defineProperty(Request, 'FormData', {
   get() {
-    if (CustomFormData) {
-      return CustomFormData
-    }
-
-    return isNodeJS() || typeof FormData === 'undefined'
-      ? require('form-data')
-      : FormData
+    return getFormData()
   },
 
   set(value) {
-    CustomFormData = value
+    setFormData(value)
   }
 })
 

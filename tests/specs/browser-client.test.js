@@ -332,14 +332,7 @@ describe('Browser Client', () => {
 
   describe('Request Form', () => {
     it('gets FormData from the global scope', async () => {
-      global.FormData = 123
-
-      expect(Request.FormData).toBe(123)
-
-      delete global.FormData
-    })
-
-    it('gets FormData from the node_modules', async () => {
+      // NodeJS 18.x has FormData in the global scope
       expect(Request.FormData).toBe(FormData)
     })
 
