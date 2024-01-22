@@ -11,7 +11,8 @@ backendless.min.js => ~ 11 KB
   - [Install](#install)
   - [Require it as a module](#require-it-as-a-module)
   - [Include it as a single file](#include-it-as-a-single-file)
-  - [As a part of the Backendless JS-SDK](#as-a-part-of-the-backendless-js-sdk)
+  - [As a part of the JS-SDK](#as-a-part-of-the-js-sdk)
+  - [In the UI Builder and JS Cloud Code environment](#in-the-ui-builder-and-js-cloud-code-environment)
 
 - [Request Methods](#request-methods)
   - [GET](#get)
