@@ -11,6 +11,7 @@ backendless.min.js => ~ 11 KB
   - [Install](#install)
   - [Require it as a module](#require-it-as-a-module)
   - [Include it as a single file](#include-it-as-a-single-file)
+  - [As a part of the Backendless JS-SDK](#as-a-part-of-the-backendless-js-sdk)
 
 - [Request Methods](#request-methods)
   - [GET](#get)
@@ -78,6 +79,27 @@ After that you can use `BackendlessRequest` from the global scope
 
 ````js
 BackendlessRequest.get('http://foo.bar/')
+````
+
+### As a part of the JS-SDK
+Since the JS-SDK already uses the module for API requests, therefor if you use the SDK in your code you can use the Request module as well in your code without additional require, see the example below: 
+
+````js
+import Backendless from 'backendless';
+
+Backendless.Request.get('http://foo.bar/')
+  .then(result => console.log(result))
+  .catch(error => console.error(error))
+````
+
+### In the UI Builder and JS Cloud Code environment
+The Backendless UI Builder and JS Cloud Code include the Backendelss JS-SDK in the global scope, therefor the Request module is also available there, see the example below: 
+
+````js
+
+Backendless.Request.get('http://foo.bar/')
+  .then(result => console.log(result))
+  .catch(error => console.error(error))
 ````
 
 ### Request Methods
