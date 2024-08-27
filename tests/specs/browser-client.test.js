@@ -149,7 +149,7 @@ describe('Browser Client', () => {
 
         await Request.get('http://foo.bar/path/@/ /абв/')
 
-        expect(transaction.options.path).toEqual('http://foo.bar/path/@/%20/%D0%B0%D0%B1%D0%B2/')
+        expect(transaction.options.path).toEqual('http://foo.bar/path/%40/%20/%D0%B0%D0%B1%D0%B2/')
       })
 
     it('should not encode already encoded URI components', async () => {
@@ -176,7 +176,7 @@ describe('Browser Client', () => {
       await Request.get('http://foo.bar/path/@/ /абв/')
       await Request.get('http://foo.bar/path/%40/%20/%D0%B0%D0%B1%D0%B2/')
 
-      expect(transaction1.options.path).toEqual('http://foo.bar/path/@/%20/%D0%B0%D0%B1%D0%B2/')
+      expect(transaction1.options.path).toEqual('http://foo.bar/path/%40/%20/%D0%B0%D0%B1%D0%B2/')
       expect(transaction2.options.path).toEqual('http://foo.bar/path/%40/%20/%D0%B0%D0%B1%D0%B2/')
     })
   })

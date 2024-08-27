@@ -52,10 +52,24 @@ export function setFormData(value) {
   CustomFormData = value
 }
 
-export function ensureEncoding(url) {
-  if (url === decodeURI(url)) {
-    return encodeURI(url)
+function ensureComponentEncoding(uriComponent) {
+  if (uriComponent === decodeURIComponent(uriComponent)) {
+    return encodeURIComponent(uriComponent)
   }
 
-  return url
+  return uriComponent
+}
+
+function encodePath(path) {
+  return path.split('/').map(ensureComponentEncoding).join('/')
+}
+
+export function ensureEncoding(path) {
+  try {
+    const url = new URL(path)
+
+    return url.origin + encodePath(url.pathname)
+  } catch {
+    return encodePath(path)
+  }
 }
