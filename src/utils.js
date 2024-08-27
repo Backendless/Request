@@ -68,7 +68,7 @@ export function ensureEncoding(path) {
   try {
     const url = new URL(path)
 
-    return url.origin + encodePath(url.pathname)
+    return url.origin + encodePath(url.pathname) + url.search
   } catch {
     return encodePath(path)
   }

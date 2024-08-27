@@ -145,11 +145,14 @@ describe('Browser Client', () => {
 
   describe('Request URL', () => {
       it('should encode URL', async () => {
-        const transaction = registerBrowserTransaction(null)
+        const transaction1 = registerBrowserTransaction(null)
+        const transaction2 = registerBrowserTransaction(null)
 
         await Request.get('http://foo.bar/path/@/ /абв/')
+        await Request.get('http://foo.bar/path/@/ /абв?ключ=значние')
 
-        expect(transaction.options.path).toEqual('http://foo.bar/path/%40/%20/%D0%B0%D0%B1%D0%B2/')
+        expect(transaction1.options.path).toEqual('http://foo.bar/path/%40/%20/%D0%B0%D0%B1%D0%B2/')
+        expect(transaction2.options.path).toEqual('http://foo.bar/path/%40/%20/%D0%B0%D0%B1%D0%B2?%D0%BA%D0%BB%D1%8E%D1%87=%D0%B7%D0%BD%D0%B0%D1%87%D0%BD%D0%B8%D0%B5')
       })
 
     it('should not encode already encoded URI components', async () => {
