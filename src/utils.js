@@ -52,3 +52,10 @@ export function setFormData(value) {
   CustomFormData = value
 }
 
+export function ensureEncoding(url) {
+  if (url === decodeURI(url)) {
+    return encodeURI(url)
+  }
+
+  return url
+}
