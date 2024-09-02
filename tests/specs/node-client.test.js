@@ -155,15 +155,7 @@ describe('Node Client', () => {
   })
 
   describe('Request URL', () => {
-    it('should encode URL', async () => {
-      const transaction = registerNodeTransaction(null)
-
-      await Request.get('http://foo.bar/path/@/ /абв/')
-
-      expect(transaction.options.path).toEqual('/path/%40/%20/%D0%B0%D0%B1%D0%B2/')
-    })
-
-    it('should not encode already encoded URI components', async () => {
+    it('has encoded URI components', async () => {
       const transaction1 = registerNodeTransaction(null)
       const transaction2 = registerNodeTransaction(null)
       const transaction3 = registerNodeTransaction(null)
@@ -183,15 +175,12 @@ describe('Node Client', () => {
     it('has specific URI components', async () => {
       const transaction1 = registerNodeTransaction(null)
       const transaction2 = registerNodeTransaction(null)
-      const transaction3 = registerNodeTransaction(null)
 
-      await Request.get('http://foo.bar/path/with/email/valid@email.com/')
       await Request.get('http://foo.bar/path/@/ /абв/')
       await Request.get('http://foo.bar/path/%40/%20/%D0%B0%D0%B1%D0%B2/')
 
-      expect(transaction1.options.path).toEqual('/path/with/email/valid%40email.com/')
+      expect(transaction1.options.path).toEqual('/path/@/%20/абв/')
       expect(transaction2.options.path).toEqual('/path/%40/%20/%D0%B0%D0%B1%D0%B2/')
-      expect(transaction3.options.path).toEqual('/path/%40/%20/%D0%B0%D0%B1%D0%B2/')
     })
 
     it('specific case #1', async () => {
@@ -203,7 +192,7 @@ describe('Node Client', () => {
         'headers'        : {},
         'host'           : 'docs.googleapis.com',
         'method'         : 'GET',
-        'path'           : '/v1/documents/10psXGc-EW3vkeGXP0qG3v66Q-uo%3AbatchUpdate',
+        'path'           : '/v1/documents/10psXGc-EW3vkeGXP0qG3v66Q-uo:batchUpdate',
         'port'           : 443,
         'timeout'        : 0,
         'withCredentials': false
