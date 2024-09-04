@@ -52,12 +52,23 @@ export function setFormData(value) {
   CustomFormData = value
 }
 
+const SAFE_CHAR_CODES = ['%40', '%3A']
+
+function safeEscape(str, charCodes) {
+  const char = charCodes[0]
+
+  if (char) {
+    const tokens = str.split(char).map(p => safeEscape(p, charCodes.slice(1)))
+
+    return tokens.join(char)
+  }
+
+  return encodeURI(str)
+}
+
 function ensureComponentEncoding(uriComponent) {
   if (uriComponent === decodeURI(uriComponent)) {
-    return uriComponent
-      .split('%40')
-      .map(part => part.split('%3A').map(v => encodeURI(v)).join('%3A'))
-      .join('%40')
+    return safeEscape(uriComponent, SAFE_CHAR_CODES)
   }
 
   return uriComponent
