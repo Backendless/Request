@@ -53,8 +53,11 @@ export function setFormData(value) {
 }
 
 function ensureComponentEncoding(uriComponent) {
-  if (uriComponent === decodeURIComponent(uriComponent)) {
-    return encodeURIComponent(uriComponent)
+  if (uriComponent === decodeURI(uriComponent)) {
+    return uriComponent
+      .split('%40')
+      .map(part => part.split('%3A').map(v => encodeURI(v)).join('%3A'))
+      .join('%40')
   }
 
   return uriComponent

@@ -186,7 +186,7 @@ export class Request extends EventEmitter {
   }
 
   /**
-   * Sends the requst
+   * Sends the request
    *
    * @param {Object} body
    * @returns {Promise}
