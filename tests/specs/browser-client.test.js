@@ -160,27 +160,33 @@ describe('Browser Client', () => {
       const transaction2 = registerBrowserTransaction(null)
       const transaction3 = registerBrowserTransaction(null)
       const transaction4 = registerBrowserTransaction(null)
+      const transaction5 = registerBrowserTransaction(null)
 
       await Request.get(`http://foo.bar/path/${encodeURIComponent('@')}/${encodeURIComponent(' ')}`)
       await Request.get(`http://foo.bar/path/%40/${encodeURIComponent(' ')}`)
       await Request.get(`http://foo.bar/path/${encodeURIComponent('@')}/%20`)
       await Request.get('http://foo.bar/path/%40/%20')
+      await Request.get('http://foo.bar/path/%3A')
 
       expect(transaction1.options.path).toEqual('http://foo.bar/path/%40/%20')
       expect(transaction2.options.path).toEqual('http://foo.bar/path/%40/%20')
       expect(transaction3.options.path).toEqual('http://foo.bar/path/%40/%20')
       expect(transaction4.options.path).toEqual('http://foo.bar/path/%40/%20')
+      expect(transaction5.options.path).toEqual('http://foo.bar/path/%3A')
     })
 
     it('has specific URI components', async () => {
       const transaction1 = registerBrowserTransaction(null)
       const transaction2 = registerBrowserTransaction(null)
+      const transaction3 = registerBrowserTransaction(null)
 
       await Request.get('http://foo.bar/path/@/ /абв/')
       await Request.get('http://foo.bar/path/%40/%20/%D0%B0%D0%B1%D0%B2/')
+      await Request.get('http://foo.bar/foo:bar/')
 
       expect(transaction1.options.path).toEqual('http://foo.bar/path/@/%20/%D0%B0%D0%B1%D0%B2/')
       expect(transaction2.options.path).toEqual('http://foo.bar/path/%40/%20/%D0%B0%D0%B1%D0%B2/')
+      expect(transaction3.options.path).toEqual('http://foo.bar/foo:bar/')
     })
   })
 
