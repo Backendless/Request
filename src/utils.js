@@ -1,6 +1,6 @@
 /**
  * Casts `value` as an array if it's not one.
- * Equvivalent to lodash/castArray
+ * Equivalent to lodash/castArray
  */
 export const castArray = value => {
   return Array.isArray(value) ? value : [value]
