@@ -1,6 +1,6 @@
 /**
  * Casts `value` as an array if it's not one.
- * Equivalent to lodash/castArray
+ * Equvivalent to lodash/castArray
  */
 export const castArray = value => {
   return Array.isArray(value) ? value : [value]
@@ -52,3 +52,24 @@ export function setFormData(value) {
   CustomFormData = value
 }
 
+function ensureComponentEncoding(uriComponent) {
+  if (uriComponent === decodeURIComponent(uriComponent)) {
+    return encodeURIComponent(uriComponent)
+  }
+
+  return uriComponent
+}
+
+function encodePath(path) {
+  return path.split('/').map(ensureComponentEncoding).join('/')
+}
+
+export function ensureEncoding(path) {
+  try {
+    const url = new URL(path)
+
+    return url.origin + encodePath(url.pathname) + url.search
+  } catch {
+    return encodePath(path)
+  }
+}
