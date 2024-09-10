@@ -1,7 +1,7 @@
 import { cache } from './cache'
 import EventEmitter from './event-emitter'
 import * as qs from './qs'
-import { castArray, isObject, isFormData } from './utils'
+import { castArray, isObject, isFormData, ensureEncoding } from './utils'
 import { ResponseError } from './error'
 
 const CONTENT_TYPE_HEADER = 'Content-Type'
@@ -17,7 +17,7 @@ export class Request extends EventEmitter {
     super()
 
     this.method = method
-    this.path = path
+    this.path = ensureEncoding(path)
     this.body = body
     this.tags = undefined
     this.unwrap = true

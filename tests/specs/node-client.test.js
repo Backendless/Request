@@ -155,32 +155,49 @@ describe('Node Client', () => {
   })
 
   describe('Request URL', () => {
-    it('has encoded URI components', async () => {
+    it('should encode URL', async () => {
+      const transaction = registerNodeTransaction(null)
+
+      await Request.get('http://foo.bar/path/@/ /абв/')
+
+      expect(transaction.options.path).toEqual('/path/@/%20/%D0%B0%D0%B1%D0%B2/')
+    })
+
+    it('should not encode already encoded URI components', async () => {
       const transaction1 = registerNodeTransaction(null)
       const transaction2 = registerNodeTransaction(null)
       const transaction3 = registerNodeTransaction(null)
       const transaction4 = registerNodeTransaction(null)
+      const transaction5 = registerNodeTransaction(null)
 
       await Request.get(`http://foo.bar/path/${encodeURIComponent('@')}/${encodeURIComponent(' ')}`)
       await Request.get(`http://foo.bar/path/%40/${encodeURIComponent(' ')}`)
       await Request.get(`http://foo.bar/path/${encodeURIComponent('@')}/%20`)
       await Request.get('http://foo.bar/path/%40/%20')
+      await Request.get('http://foo.bar/path/%3A')
 
       expect(transaction1.options.path).toEqual('/path/%40/%20')
       expect(transaction2.options.path).toEqual('/path/%40/%20')
       expect(transaction3.options.path).toEqual('/path/%40/%20')
       expect(transaction4.options.path).toEqual('/path/%40/%20')
+      expect(transaction5.options.path).toEqual('/path/%3A')
     })
 
     it('has specific URI components', async () => {
       const transaction1 = registerNodeTransaction(null)
       const transaction2 = registerNodeTransaction(null)
+      const transaction3 = registerNodeTransaction(null)
+      const transaction4 = registerNodeTransaction(null)
 
+      await Request.get('http://foo.bar/path/with/email/valid@email.com/')
       await Request.get('http://foo.bar/path/@/ /абв/')
       await Request.get('http://foo.bar/path/%40/%20/%D0%B0%D0%B1%D0%B2/')
+      await Request.get('http://foo.bar/foo:bar/')
 
-      expect(transaction1.options.path).toEqual('/path/@/%20/абв/')
-      expect(transaction2.options.path).toEqual('/path/%40/%20/%D0%B0%D0%B1%D0%B2/')
+      expect(transaction1.options.path).toEqual('/path/with/email/valid@email.com/')
+      expect(transaction2.options.path).toEqual('/path/@/%20/%D0%B0%D0%B1%D0%B2/')
+      expect(transaction3.options.path).toEqual('/path/%40/%20/%D0%B0%D0%B1%D0%B2/')
+      expect(transaction4.options.path).toEqual('/foo:bar/')
     })
 
     it('specific case #1', async () => {
