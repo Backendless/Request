@@ -161,18 +161,21 @@ describe('Browser Client', () => {
       const transaction3 = registerBrowserTransaction(null)
       const transaction4 = registerBrowserTransaction(null)
       const transaction5 = registerBrowserTransaction(null)
+      const transaction6 = registerBrowserTransaction(null)
 
       await Request.get(`http://foo.bar/path/${encodeURIComponent('@')}/${encodeURIComponent(' ')}`)
       await Request.get(`http://foo.bar/path/%40/${encodeURIComponent(' ')}`)
       await Request.get(`http://foo.bar/path/${encodeURIComponent('@')}/%20`)
       await Request.get('http://foo.bar/path/%40/%20')
       await Request.get('http://foo.bar/path/%3A')
+      await Request.get('http://foo.bar/path/%2F')
 
       expect(transaction1.options.path).toEqual('http://foo.bar/path/%40/%20')
       expect(transaction2.options.path).toEqual('http://foo.bar/path/%40/%20')
       expect(transaction3.options.path).toEqual('http://foo.bar/path/%40/%20')
       expect(transaction4.options.path).toEqual('http://foo.bar/path/%40/%20')
       expect(transaction5.options.path).toEqual('http://foo.bar/path/%3A')
+      expect(transaction6.options.path).toEqual('http://foo.bar/path/%2F')
     })
 
     it('has specific URI components', async () => {

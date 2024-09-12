@@ -52,7 +52,7 @@ export function setFormData(value) {
   CustomFormData = value
 }
 
-const SAFE_CHAR_CODES = ['%40', '%3A']
+const SAFE_CHAR_CODES = ['%40', '%3A', '%2F']
 
 function safeEscape(str, charCodes) {
   const char = charCodes[0]

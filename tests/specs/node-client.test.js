@@ -169,18 +169,21 @@ describe('Node Client', () => {
       const transaction3 = registerNodeTransaction(null)
       const transaction4 = registerNodeTransaction(null)
       const transaction5 = registerNodeTransaction(null)
+      const transaction6 = registerNodeTransaction(null)
 
       await Request.get(`http://foo.bar/path/${encodeURIComponent('@')}/${encodeURIComponent(' ')}`)
       await Request.get(`http://foo.bar/path/%40/${encodeURIComponent(' ')}`)
       await Request.get(`http://foo.bar/path/${encodeURIComponent('@')}/%20`)
       await Request.get('http://foo.bar/path/%40/%20')
       await Request.get('http://foo.bar/path/%3A')
+      await Request.get('http://foo.bar/path/%2F')
 
       expect(transaction1.options.path).toEqual('/path/%40/%20')
       expect(transaction2.options.path).toEqual('/path/%40/%20')
       expect(transaction3.options.path).toEqual('/path/%40/%20')
       expect(transaction4.options.path).toEqual('/path/%40/%20')
       expect(transaction5.options.path).toEqual('/path/%3A')
+      expect(transaction6.options.path).toEqual('/path/%2F')
     })
 
     it('has specific URI components', async () => {
