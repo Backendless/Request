@@ -75,6 +75,10 @@ function ensureComponentEncoding(uriComponent) {
 }
 
 function encodePath(path) {
+  if (path.endsWith('/')) {
+    path = path.slice(0, -1)
+  }
+
   return path.split('/').map(ensureComponentEncoding).join('/')
 }
 

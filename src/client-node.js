@@ -5,11 +5,15 @@ export function sendNodeAPIRequest(path, method, headers, body, encoding, timeou
     const u = require('url').parse(path)
     const form = isFormData(body) && body
 
+    const pathname = u.pathname.endsWith('/')
+      ? u.pathname.slice(0, -1)
+      : u.pathname
+
     const https = u.protocol === 'https:'
     const options = {
       host: u.hostname,
       port: u.port || (https ? 443 : 80),
-      path: u.pathname + (u.search || ''),
+      path: pathname + (u.search || ''),
       method,
       headers,
       timeout,

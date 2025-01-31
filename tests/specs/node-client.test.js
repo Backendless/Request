@@ -155,12 +155,20 @@ describe('Node Client', () => {
   })
 
   describe('Request URL', () => {
+    it('should not add an extra slash at the pathname end', async () => {
+      const transaction = registerNodeTransaction(null)
+
+      await Request.get('https://test-image-url.com')
+
+      expect(transaction.options.path).toEqual('')
+    })
+
     it('should encode URL', async () => {
       const transaction = registerNodeTransaction(null)
 
       await Request.get('http://foo.bar/path/@/ /абв/')
 
-      expect(transaction.options.path).toEqual('/path/@/%20/%D0%B0%D0%B1%D0%B2/')
+      expect(transaction.options.path).toEqual('/path/@/%20/%D0%B0%D0%B1%D0%B2')
     })
 
     it('should not encode already encoded URI components', async () => {
@@ -197,10 +205,10 @@ describe('Node Client', () => {
       await Request.get('http://foo.bar/path/%40/%20/%D0%B0%D0%B1%D0%B2/')
       await Request.get('http://foo.bar/foo:bar/')
 
-      expect(transaction1.options.path).toEqual('/path/with/email/valid@email.com/')
-      expect(transaction2.options.path).toEqual('/path/@/%20/%D0%B0%D0%B1%D0%B2/')
-      expect(transaction3.options.path).toEqual('/path/%40/%20/%D0%B0%D0%B1%D0%B2/')
-      expect(transaction4.options.path).toEqual('/foo:bar/')
+      expect(transaction1.options.path).toEqual('/path/with/email/valid@email.com')
+      expect(transaction2.options.path).toEqual('/path/@/%20/%D0%B0%D0%B1%D0%B2')
+      expect(transaction3.options.path).toEqual('/path/%40/%20/%D0%B0%D0%B1%D0%B2')
+      expect(transaction4.options.path).toEqual('/foo:bar')
     })
 
     it('specific case #1', async () => {
