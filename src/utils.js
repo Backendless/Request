@@ -74,8 +74,8 @@ function ensureComponentEncoding(uriComponent) {
   return uriComponent
 }
 
-function encodePath(path) {
-  if (path.endsWith('/')) {
+function encodePath(path, keepLastSlash) {
+  if (!keepLastSlash && path.endsWith('/')) {
     path = path.slice(0, -1)
   }
 
@@ -85,8 +85,9 @@ function encodePath(path) {
 export function ensureEncoding(path) {
   try {
     const url = new URL(path)
+    const keepLastSlash = path.endsWith('/')
 
-    return url.origin + encodePath(url.pathname) + url.search
+    return url.origin + encodePath(url.pathname, keepLastSlash) + url.search
   } catch {
     return encodePath(path)
   }

@@ -152,6 +152,17 @@ describe('Browser Client', () => {
       expect(transaction.options.path).toEqual('https://test-image-url.com')
     })
 
+    it('should not add a slash to the URL end', async () => {
+      const transaction1 = registerBrowserTransaction(null)
+      const transaction2 = registerBrowserTransaction(null)
+
+      await Request.get('http://foo.bar')
+      await Request.get('http://foo.bar/path')
+
+      expect(transaction1.options.path).toEqual('http://foo.bar')
+      expect(transaction2.options.path).toEqual('http://foo.bar/path')
+    })
+
     it('should encode URL', async () => {
       const transaction1 = registerBrowserTransaction(null)
       const transaction2 = registerBrowserTransaction(null)
@@ -159,7 +170,7 @@ describe('Browser Client', () => {
       await Request.get('http://foo.bar/path/@/ /абв/')
       await Request.get('http://foo.bar/path/%40/ /абв?ключ=значние')
 
-      expect(transaction1.options.path).toEqual('http://foo.bar/path/@/%20/%D0%B0%D0%B1%D0%B2')
+      expect(transaction1.options.path).toEqual('http://foo.bar/path/@/%20/%D0%B0%D0%B1%D0%B2/')
       expect(transaction2.options.path).toEqual('http://foo.bar/path/%40/%20/%D0%B0%D0%B1%D0%B2?%D0%BA%D0%BB%D1%8E%D1%87=%D0%B7%D0%BD%D0%B0%D1%87%D0%BD%D0%B8%D0%B5')
     })
 
@@ -186,7 +197,7 @@ describe('Browser Client', () => {
       expect(transaction6.options.path).toEqual('http://foo.bar/path/%2F')
     })
 
-    it('has specific URI components', async () => {
+    it('has specific URI components and keeps the last slash', async () => {
       const transaction1 = registerBrowserTransaction(null)
       const transaction2 = registerBrowserTransaction(null)
       const transaction3 = registerBrowserTransaction(null)
@@ -195,9 +206,9 @@ describe('Browser Client', () => {
       await Request.get('http://foo.bar/path/%40/%20/%D0%B0%D0%B1%D0%B2/')
       await Request.get('http://foo.bar/foo:bar/')
 
-      expect(transaction1.options.path).toEqual('http://foo.bar/path/@/%20/%D0%B0%D0%B1%D0%B2')
-      expect(transaction2.options.path).toEqual('http://foo.bar/path/%40/%20/%D0%B0%D0%B1%D0%B2')
-      expect(transaction3.options.path).toEqual('http://foo.bar/foo:bar')
+      expect(transaction1.options.path).toEqual('http://foo.bar/path/@/%20/%D0%B0%D0%B1%D0%B2/')
+      expect(transaction2.options.path).toEqual('http://foo.bar/path/%40/%20/%D0%B0%D0%B1%D0%B2/')
+      expect(transaction3.options.path).toEqual('http://foo.bar/foo:bar/')
     })
   })
 

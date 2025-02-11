@@ -5,7 +5,9 @@ export function sendNodeAPIRequest(path, method, headers, body, encoding, timeou
     const u = require('url').parse(path)
     const form = isFormData(body) && body
 
-    const pathname = u.pathname.endsWith('/')
+    const keepLastSlash = path.endsWith('/')
+
+    const pathname = (!keepLastSlash && u.pathname.endsWith('/'))
       ? u.pathname.slice(0, -1)
       : u.pathname
 

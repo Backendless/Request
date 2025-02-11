@@ -4,7 +4,7 @@ import FormData from 'form-data'
 import Request from '../../src'
 import { cache } from '../../src/cache'
 
-import { registerNodeTransaction, wait } from '../helpers'
+import { registerBrowserTransaction, registerNodeTransaction, wait } from '../helpers'
 import { isBrowser, isNodeJS } from '../../src/utils'
 
 jest.mock('../../src/utils', () => {
@@ -168,7 +168,18 @@ describe('Node Client', () => {
 
       await Request.get('http://foo.bar/path/@/ /абв/')
 
-      expect(transaction.options.path).toEqual('/path/@/%20/%D0%B0%D0%B1%D0%B2')
+      expect(transaction.options.path).toEqual('/path/@/%20/%D0%B0%D0%B1%D0%B2/')
+    })
+
+    it('should not add a slash to the URL end', async () => {
+      const transaction1 = registerBrowserTransaction(null)
+      const transaction2 = registerBrowserTransaction(null)
+
+      await Request.get('http://foo.bar')
+      await Request.get('http://foo.bar/path')
+
+      expect(transaction1.options.path).toEqual('http://foo.bar')
+      expect(transaction2.options.path).toEqual('http://foo.bar/path')
     })
 
     it('should not encode already encoded URI components', async () => {
@@ -194,7 +205,7 @@ describe('Node Client', () => {
       expect(transaction6.options.path).toEqual('/path/%2F')
     })
 
-    it('has specific URI components', async () => {
+    it('has specific URI components and keeps a slash at the url end', async () => {
       const transaction1 = registerNodeTransaction(null)
       const transaction2 = registerNodeTransaction(null)
       const transaction3 = registerNodeTransaction(null)
@@ -205,10 +216,10 @@ describe('Node Client', () => {
       await Request.get('http://foo.bar/path/%40/%20/%D0%B0%D0%B1%D0%B2/')
       await Request.get('http://foo.bar/foo:bar/')
 
-      expect(transaction1.options.path).toEqual('/path/with/email/valid@email.com')
-      expect(transaction2.options.path).toEqual('/path/@/%20/%D0%B0%D0%B1%D0%B2')
-      expect(transaction3.options.path).toEqual('/path/%40/%20/%D0%B0%D0%B1%D0%B2')
-      expect(transaction4.options.path).toEqual('/foo:bar')
+      expect(transaction1.options.path).toEqual('/path/with/email/valid@email.com/')
+      expect(transaction2.options.path).toEqual('/path/@/%20/%D0%B0%D0%B1%D0%B2/')
+      expect(transaction3.options.path).toEqual('/path/%40/%20/%D0%B0%D0%B1%D0%B2/')
+      expect(transaction4.options.path).toEqual('/foo:bar/')
     })
 
     it('specific case #1', async () => {
@@ -1180,3 +1191,6 @@ describe('Node Client', () => {
   })
 
 })
+
+
+
