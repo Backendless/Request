@@ -171,6 +171,14 @@ describe('Node Client', () => {
       expect(transaction.options.path).toEqual('/path/@/%20/%D0%B0%D0%B1%D0%B2/')
     })
 
+    it('should keep the last slash in URL with query params', async () => {
+      const transaction = registerNodeTransaction(null)
+
+      await Request.get('http://foo.bar/path/?foo=bar')
+
+      expect(transaction.options.path).toEqual('/path/?foo=bar')
+    })
+
     it('should not add a slash to the URL end', async () => {
       const transaction1 = registerBrowserTransaction(null)
       const transaction2 = registerBrowserTransaction(null)

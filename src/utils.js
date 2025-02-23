@@ -74,21 +74,28 @@ function ensureComponentEncoding(uriComponent) {
   return uriComponent
 }
 
-function encodePath(path, keepLastSlash) {
-  if (!keepLastSlash && path.endsWith('/')) {
-    path = path.slice(0, -1)
-  }
-
+function encodePath(path) {
   return path.split('/').map(ensureComponentEncoding).join('/')
 }
 
 export function ensureEncoding(path) {
   try {
     const url = new URL(path)
-    const keepLastSlash = path.endsWith('/')
 
-    return url.origin + encodePath(url.pathname, keepLastSlash) + url.search
+    return url.origin + encodePath(normalizeTrailingSlashInPath(path, url)) + url.search
   } catch {
     return encodePath(path)
   }
+}
+
+export function normalizeTrailingSlashInPath(originPath, { pathname, search }) {
+  if (search) {
+    originPath = originPath.replace(search, '')
+  }
+
+  const keepTrailingSlash = originPath.endsWith('/')
+
+  return (!keepTrailingSlash && pathname.endsWith('/'))
+    ? pathname.slice(0, -1)
+    : pathname
 }
