@@ -88,9 +88,9 @@ export function ensureEncoding(path) {
   }
 }
 
-export function normalizeTrailingSlashInPath(originPath, { pathname, search }) {
-  if (search) {
-    originPath = originPath.replace(search, '')
+export function normalizeTrailingSlashInPath(originPath, { pathname }) {
+  if (originPath.includes('?')) {
+    originPath = originPath.split('?')[0]
   }
 
   const keepTrailingSlash = originPath.endsWith('/')

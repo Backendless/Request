@@ -4,7 +4,7 @@ import FormData from 'form-data'
 import Request from '../../src'
 import { cache } from '../../src/cache'
 
-import { registerBrowserTransaction, registerNodeTransaction, wait } from '../helpers'
+import { registerNodeTransaction, wait } from '../helpers'
 import { isBrowser, isNodeJS } from '../../src/utils'
 
 jest.mock('../../src/utils', () => {
@@ -179,15 +179,31 @@ describe('Node Client', () => {
       expect(transaction.options.path).toEqual('/path/?foo=bar')
     })
 
+    it('should keep the last slash in URL with query params #1', async () => {
+      const transaction = registerNodeTransaction(null)
+
+      await Request.get('http://foo.bar/path/').query({ q: "'" })
+
+      expect(transaction.options.path).toEqual('/path/?q=%27')
+    })
+
+    it('should keep the last slash in URL with query params #2', async () => {
+      const transaction = registerNodeTransaction(null)
+
+      await Request.get('http://foo.bar/path/').query({ q: 'тест' })
+
+      expect(transaction.options.path).toEqual('/path/?q=%D1%82%D0%B5%D1%81%D1%82')
+    })
+
     it('should not add a slash to the URL end', async () => {
-      const transaction1 = registerBrowserTransaction(null)
-      const transaction2 = registerBrowserTransaction(null)
+      const transaction1 = registerNodeTransaction(null)
+      const transaction2 = registerNodeTransaction(null)
 
       await Request.get('http://foo.bar')
       await Request.get('http://foo.bar/path')
 
-      expect(transaction1.options.path).toEqual('http://foo.bar')
-      expect(transaction2.options.path).toEqual('http://foo.bar/path')
+      expect(transaction1.options.path).toEqual('')
+      expect(transaction2.options.path).toEqual('/path')
     })
 
     it('should not encode already encoded URI components', async () => {

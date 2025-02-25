@@ -160,6 +160,22 @@ describe('Browser Client', () => {
       expect(transaction.options.path).toEqual('http://foo.bar/path/?foo=bar')
     })
 
+    it('should keep the last slash in URL with query params #1', async () => {
+      const transaction = registerBrowserTransaction(null)
+
+      await Request.get('http://foo.bar/path/').query({ q: "'" })
+
+      expect(transaction.options.path).toEqual('http://foo.bar/path/?q=\'')
+    })
+
+    it('should keep the last slash in URL with query params #2', async () => {
+      const transaction = registerBrowserTransaction(null)
+
+      await Request.get('http://foo.bar/path/').query({ q: 'тест' })
+
+      expect(transaction.options.path).toEqual('http://foo.bar/path/?q=%D1%82%D0%B5%D1%81%D1%82')
+    })
+
     it('should not add a slash to the URL end', async () => {
       const transaction1 = registerBrowserTransaction(null)
       const transaction2 = registerBrowserTransaction(null)
