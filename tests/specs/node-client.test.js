@@ -206,6 +206,14 @@ describe('Node Client', () => {
       expect(transaction2.options.path).toEqual('/path')
     })
 
+    it('should not encode already encoded URI components with #', async () => {
+      const transaction1 = registerNodeTransaction(null)
+
+      await Request.get(`http://localhost:3001/foo/${encodeURIComponent('S#S##S#')}/bar`)
+
+      expect(transaction1.options.path).toEqual('/foo/S%23S%23%23S%23/bar')
+    })
+
     it('should not encode already encoded URI components', async () => {
       const transaction1 = registerNodeTransaction(null)
       const transaction2 = registerNodeTransaction(null)
@@ -260,6 +268,20 @@ describe('Node Client', () => {
         'timeout'        : 0,
         'withCredentials': false
       })
+    })
+
+    it('exclude uri hash', async () => {
+      const transaction1 = registerNodeTransaction(null)
+      const transaction2 = registerNodeTransaction(null)
+      const transaction3 = registerNodeTransaction(null)
+
+      await Request.get('http://localhost:3001/foo#num=123')
+      await Request.get('http://localhost:3001/foo#bar=bar&str=test')
+      await Request.get('http://localhost:3001/foo?q=name#bar=bar&str=test')
+
+      expect(transaction1.options.path).toEqual('/foo')
+      expect(transaction2.options.path).toEqual('/foo')
+      expect(transaction3.options.path).toEqual('/foo?q=name')
     })
   })
 

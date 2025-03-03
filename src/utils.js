@@ -52,7 +52,7 @@ export function setFormData(value) {
   CustomFormData = value
 }
 
-const SAFE_CHAR_CODES = ['%40', '%3A', '%2F']
+const SAFE_CHAR_CODES = ['%40', '%3A', '%2F', '%23']
 
 function safeEscape(str, charCodes) {
   const char = charCodes[0]
@@ -68,7 +68,7 @@ function safeEscape(str, charCodes) {
 
 function ensureComponentEncoding(uriComponent) {
   if (uriComponent === decodeURI(uriComponent)) {
-    return safeEscape(uriComponent, SAFE_CHAR_CODES)
+    return safeEscape(uriComponent, [...SAFE_CHAR_CODES])
   }
 
   return uriComponent
