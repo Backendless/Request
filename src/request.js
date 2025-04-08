@@ -255,6 +255,8 @@ export class Request extends EventEmitter {
       ? this.withCredentials
       : Request.withCredentials
 
+    const syncError = new Error()
+
     const request = Request.send(
       path,
       this.method.toUpperCase(),
@@ -269,6 +271,11 @@ export class Request extends EventEmitter {
       .then(unwrapBody)
       .then(cacheResponse)
       .then(flushCache)
+      .catch(error => {
+        error.stack = `${error.stack}${syncError.stack}`
+
+        throw error
+      })
 
     request
       .then(result => {
