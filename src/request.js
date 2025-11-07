@@ -27,6 +27,7 @@ export class Request extends EventEmitter {
     this.encoding = 'utf8'
     this.timeout = 0
     this.withCredentials = null
+    this.abortSignal = null
   }
 
   /**
@@ -186,6 +187,17 @@ export class Request extends EventEmitter {
   }
 
   /**
+   * Sets abort signal
+   * @param abortSignal
+   * @returns {Request}
+   */
+  setAbortSignal(abortSignal) {
+    this.abortSignal = abortSignal
+
+    return this
+  }
+
+  /**
    * Sends the request
    *
    * @param {Object} body
@@ -264,7 +276,8 @@ export class Request extends EventEmitter {
       body,
       this.encoding,
       this.timeout,
-      withCredentials
+      withCredentials,
+      this.abortSignal,
     )
       .then(parseBody)
       .then(checkStatus)

@@ -40,6 +40,7 @@ describe('Node Client', () => {
         'port'           : '9898',
         'timeout'        : 0,
         'withCredentials': false,
+        'signal'         : null,
       })
     })
 
@@ -57,7 +58,8 @@ describe('Node Client', () => {
         'path'           : 'foo.bar/path/to/api',
         'port'           : 80,
         'timeout'        : 0,
-        'withCredentials': false
+        'withCredentials': false,
+        'signal'         : null,
       })
     })
 
@@ -75,7 +77,8 @@ describe('Node Client', () => {
         'path'           : '/path/to/api',
         'port'           : 80,
         'timeout'        : 0,
-        'withCredentials': false
+        'withCredentials': false,
+        'signal'         : null,
       })
     })
 
@@ -93,7 +96,8 @@ describe('Node Client', () => {
         'path'           : '/path/to/api',
         'port'           : 443,
         'timeout'        : 0,
-        'withCredentials': false
+        'withCredentials': false,
+        'signal'         : null,
       })
     })
 
@@ -113,7 +117,8 @@ describe('Node Client', () => {
         'path'           : '/path/to/api',
         'port'           : '9898',
         'timeout'        : 0,
-        'withCredentials': false
+        'withCredentials': false,
+        'signal'         : null,
       })
     })
 
@@ -131,7 +136,8 @@ describe('Node Client', () => {
         'path'           : '/path/to/api',
         'port'           : '9898',
         'timeout'        : 0,
-        'withCredentials': false
+        'withCredentials': false,
+        'signal'         : null,
       })
     })
 
@@ -266,7 +272,8 @@ describe('Node Client', () => {
         'path'           : '/v1/documents/10psXGc-EW3vkeGXP0qG3v66Q-uo:batchUpdate',
         'port'           : 443,
         'timeout'        : 0,
-        'withCredentials': false
+        'withCredentials': false,
+        'signal'         : null,
       })
     })
 
@@ -301,7 +308,8 @@ describe('Node Client', () => {
         'path'           : '/path/to/api?str=str&num1=0&num2=123&bool1=true&bool2=false',
         'port'           : '9898',
         'timeout'        : 0,
-        'withCredentials': false
+        'withCredentials': false,
+        'signal'         : null,
       })
     })
 
@@ -320,7 +328,8 @@ describe('Node Client', () => {
         'path'           : '/path/to/api?numArr=1&numArr=2&numArr=3&strArr=a&strArr=b&strArr=c',
         'port'           : '9898',
         'timeout'        : 0,
-        'withCredentials': false
+        'withCredentials': false,
+        'signal'         : null,
       })
     })
 
@@ -339,7 +348,8 @@ describe('Node Client', () => {
         'path'           : '/path/to/api?str=%D0%B0%D0%B1%D0%B2&space=%20&percent=%25&at=%40&strArr=%D0%B0%D0%B1%D0%B2&strArr=%20&strArr=%25&strArr=%40',
         'port'           : '9898',
         'timeout'        : 0,
-        'withCredentials': false
+        'withCredentials': false,
+        'signal'         : null,
       })
     })
   })
@@ -361,7 +371,8 @@ describe('Node Client', () => {
         'path'           : '/path/to/api',
         'port'           : '9898',
         'timeout'        : 0,
-        'withCredentials': false
+        'withCredentials': false,
+        'signal'         : null,
       })
     })
   })
@@ -382,7 +393,8 @@ describe('Node Client', () => {
         'path'           : '/path/to/api',
         'port'           : '9898',
         'timeout'        : 0,
-        'withCredentials': false
+        'withCredentials': false,
+        'signal'         : null,
       })
     })
 
@@ -403,7 +415,8 @@ describe('Node Client', () => {
         'path'           : '/path/to/api',
         'port'           : '9898',
         'timeout'        : 0,
-        'withCredentials': false
+        'withCredentials': false,
+        'signal'         : null,
       })
 
       expect(transaction2.requestBody).toEqual('[1,2,3]')
@@ -416,7 +429,8 @@ describe('Node Client', () => {
         'path'           : '/path/to/api',
         'port'           : '9898',
         'timeout'        : 0,
-        'withCredentials': false
+        'withCredentials': false,
+        'signal'         : null,
       })
     })
 
@@ -436,7 +450,8 @@ describe('Node Client', () => {
         'path'           : '/path/to/api',
         'port'           : '9898',
         'timeout'        : 0,
-        'withCredentials': false
+        'withCredentials': false,
+        'signal'         : null,
       })
 
     })
@@ -488,7 +503,8 @@ describe('Node Client', () => {
         'path'           : '/path/to/api',
         'port'           : '9898',
         'timeout'        : 0,
-        'withCredentials': false
+        'withCredentials': false,
+        'signal'         : null,
       })
     })
 
@@ -511,7 +527,8 @@ describe('Node Client', () => {
         'path'           : '/path/to/api',
         'port'           : '9898',
         'timeout'        : 0,
-        'withCredentials': false
+        'withCredentials': false,
+        'signal'         : null,
       })
     })
 
@@ -540,7 +557,8 @@ describe('Node Client', () => {
         'path'           : '/path/to/api',
         'port'           : '9898',
         'timeout'        : 0,
-        'withCredentials': false
+        'withCredentials': false,
+        'signal'         : null,
       })
     })
   })
@@ -559,7 +577,33 @@ describe('Node Client', () => {
         'path'           : '/path/to/api',
         'port'           : '9898',
         'timeout'        : 1200,
-        'withCredentials': false
+        'withCredentials': false,
+        'signal'         : null,
+      })
+    })
+  })
+
+  describe('Request Abort Signal', () => {
+    it('runs a request with abort signal', async () => {
+      const transaction = registerNodeTransaction()
+
+      const abortController = new AbortController()
+
+      await Request.get('http://foo.bar:9898/path/to/api')
+        .setAbortSignal(abortController.signal)
+
+      const { signal, ...restOptions } = transaction.options
+
+      expect(signal).toBe(abortController.signal)
+
+      expect(restOptions).toEqual({
+        'headers'        : {},
+        'host'           : 'foo.bar',
+        'method'         : 'GET',
+        'path'           : '/path/to/api',
+        'port'           : '9898',
+        'timeout'        : 0,
+        'withCredentials': false,
       })
     })
   })
@@ -577,7 +621,8 @@ describe('Node Client', () => {
         'path'           : '/path/to/api',
         'port'           : '9898',
         'timeout'        : 0,
-        'withCredentials': false
+        'withCredentials': false,
+        'signal'         : null,
       })
     })
 
@@ -596,7 +641,8 @@ describe('Node Client', () => {
         'path'           : '/path/to/api',
         'port'           : '9898',
         'timeout'        : 0,
-        'withCredentials': false
+        'withCredentials': false,
+        'signal'         : null,
       })
     })
 
@@ -615,7 +661,8 @@ describe('Node Client', () => {
         'path'           : '/path/to/api',
         'port'           : '9898',
         'timeout'        : 0,
-        'withCredentials': false
+        'withCredentials': false,
+        'signal'         : null,
       })
     })
 
@@ -634,7 +681,8 @@ describe('Node Client', () => {
         'path'           : '/path/to/api',
         'port'           : '9898',
         'timeout'        : 0,
-        'withCredentials': false
+        'withCredentials': false,
+        'signal'         : null,
       })
     })
   })
@@ -758,7 +806,8 @@ describe('Node Client', () => {
         'path'           : '/path/to/api',
         'port'           : '9898',
         'timeout'        : 0,
-        'withCredentials': false
+        'withCredentials': false,
+        'signal'         : null,
       })
 
     })
@@ -781,7 +830,8 @@ describe('Node Client', () => {
         'path'           : '/path/to/api',
         'port'           : '9898',
         'timeout'        : 0,
-        'withCredentials': false
+        'withCredentials': false,
+        'signal'         : null,
       })
 
     })
@@ -805,7 +855,8 @@ describe('Node Client', () => {
         'path'           : '/path/to/api',
         'port'           : '9898',
         'timeout'        : 0,
-        'withCredentials': false
+        'withCredentials': false,
+        'signal'         : null,
       })
 
     })
@@ -838,7 +889,8 @@ describe('Node Client', () => {
         'path'           : '/path/to/api',
         'port'           : '9898',
         'timeout'        : 0,
-        'withCredentials': false
+        'withCredentials': false,
+        'signal'         : null,
       })
 
     })
