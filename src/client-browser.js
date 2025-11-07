@@ -1,9 +1,10 @@
 import { Request } from './request'
 
-export function sendXmlHttpRequest(path, method, headers, body, encoding, timeout, withCredentials) {
+export function sendXmlHttpRequest(path, method, headers, body, encoding, timeout, withCredentials, abortSignal) {
   return new Promise(function sendRequest(resolve, reject) {
     let request = new Request.XMLHttpRequest()
 
+    request.signal = abortSignal
     request.timeout = timeout
 
     if (!encoding) {
