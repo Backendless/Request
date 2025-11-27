@@ -213,6 +213,19 @@ describe('Browser Client', () => {
       const transaction4 = registerBrowserTransaction(null)
       const transaction5 = registerBrowserTransaction(null)
       const transaction6 = registerBrowserTransaction(null)
+      const transaction7 = registerBrowserTransaction(null)
+      const transaction8 = registerBrowserTransaction(null)
+      const transaction9 = registerBrowserTransaction(null)
+      const transaction10 = registerBrowserTransaction(null)
+      const transaction11 = registerBrowserTransaction(null)
+      const transaction12 = registerBrowserTransaction(null)
+      const transaction13 = registerBrowserTransaction(null)
+      const transaction14 = registerBrowserTransaction(null)
+      const transaction15 = registerBrowserTransaction(null)
+      const transaction16 = registerBrowserTransaction(null)
+      const transaction17 = registerBrowserTransaction(null)
+      const transaction18 = registerBrowserTransaction(null)
+      const transaction19 = registerBrowserTransaction(null)
 
       await Request.get(`http://foo.bar/path/${encodeURIComponent('@')}/${encodeURIComponent(' ')}`)
       await Request.get(`http://foo.bar/path/%40/${encodeURIComponent(' ')}`)
@@ -221,12 +234,45 @@ describe('Browser Client', () => {
       await Request.get('http://foo.bar/path/%3A')
       await Request.get('http://foo.bar/path/%2F')
 
+      await Request.get(`http://foo.bar/path/${encodeURIComponent('?')}/${encodeURIComponent('=')}`)
+      await Request.get(`http://foo.bar/path/%3F/${encodeURIComponent('=')}`)
+      await Request.get(`http://foo.bar/path/${encodeURIComponent('?')}/%3D`)
+      await Request.get('http://foo.bar/path/%3F/%3D')
+
+      await Request.get(`http://foo.bar/path/${encodeURIComponent('$')}/${encodeURIComponent('&')}`)
+      await Request.get(`http://foo.bar/path/%24/${encodeURIComponent('&')}`)
+      await Request.get(`http://foo.bar/path/${encodeURIComponent('$')}/%26`)
+      await Request.get('http://foo.bar/path/%24/%26')
+
+      await Request.get(`http://foo.bar/path/${encodeURIComponent('+')}/${encodeURIComponent('+')}`)
+      await Request.get(`http://foo.bar/path/%2B/${encodeURIComponent('+')}`)
+      await Request.get(`http://foo.bar/path/${encodeURIComponent('+')}/%2B`)
+      await Request.get('http://foo.bar/path/%2B/%2B')
+
+      await Request.get('http://foo.bar/path/%40%3A%2F%23%3F%3D%24%26%2B')
+
       expect(transaction1.options.path).toEqual('http://foo.bar/path/%40/%20')
       expect(transaction2.options.path).toEqual('http://foo.bar/path/%40/%20')
       expect(transaction3.options.path).toEqual('http://foo.bar/path/%40/%20')
       expect(transaction4.options.path).toEqual('http://foo.bar/path/%40/%20')
       expect(transaction5.options.path).toEqual('http://foo.bar/path/%3A')
       expect(transaction6.options.path).toEqual('http://foo.bar/path/%2F')
+
+      expect(transaction7.options.path).toEqual('http://foo.bar/path/%3F/%3D')
+      expect(transaction8.options.path).toEqual('http://foo.bar/path/%3F/%3D')
+      expect(transaction9.options.path).toEqual('http://foo.bar/path/%3F/%3D')
+      expect(transaction10.options.path).toEqual('http://foo.bar/path/%3F/%3D')
+
+      expect(transaction11.options.path).toEqual('http://foo.bar/path/%24/%26')
+      expect(transaction12.options.path).toEqual('http://foo.bar/path/%24/%26')
+      expect(transaction13.options.path).toEqual('http://foo.bar/path/%24/%26')
+      expect(transaction14.options.path).toEqual('http://foo.bar/path/%24/%26')
+
+      expect(transaction15.options.path).toEqual('http://foo.bar/path/%2B/%2B')
+      expect(transaction16.options.path).toEqual('http://foo.bar/path/%2B/%2B')
+      expect(transaction17.options.path).toEqual('http://foo.bar/path/%2B/%2B')
+      expect(transaction18.options.path).toEqual('http://foo.bar/path/%2B/%2B')
+      expect(transaction19.options.path).toEqual('http://foo.bar/path/%40%3A%2F%23%3F%3D%24%26%2B')
     })
 
     it('has specific URI components and keeps the last slash', async () => {
