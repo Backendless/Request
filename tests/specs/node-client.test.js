@@ -364,6 +364,99 @@ describe('Node Client', () => {
         'withCredentials': false
       })
     })
+
+    it('runs a request with basicAuth header', async () => {
+      const transaction = registerNodeTransaction()
+
+      await Request.get('http://foo.bar:9898/path/to/api')
+        .basicAuth({ token: 'my-basic-auth-token' })
+
+      expect(transaction.options).toEqual({
+        'headers'        : { 'Authorization': 'Basic my-basic-auth-token' },
+        'host'           : 'foo.bar',
+        'method'         : 'GET',
+        'path'           : '/path/to/api',
+        'port'           : '9898',
+        'timeout'        : 0,
+        'withCredentials': false
+      })
+    })
+
+    it('does not set Authorization header when basicAuth is not passed', async () => {
+      const transaction = registerNodeTransaction()
+
+      await Request.get('http://foo.bar:9898/path/to/api')
+        .basicAuth()
+
+      expect(transaction.options).toEqual({
+        'headers'        : {},
+        'host'           : 'foo.bar',
+        'method'         : 'GET',
+        'path'           : '/path/to/api',
+        'port'           : '9898',
+        'timeout'        : 0,
+        'withCredentials': false
+      })
+    })
+
+    it('runs a request with authKey header', async () => {
+      const transaction = registerNodeTransaction()
+
+      await Request.get('http://foo.bar:9898/path/to/api')
+        .authKey('my-auth-key')
+
+      expect(transaction.options).toEqual({
+        'headers'        : { 'auth-key': 'my-auth-key' },
+        'host'           : 'foo.bar',
+        'method'         : 'GET',
+        'path'           : '/path/to/api',
+        'port'           : '9898',
+        'timeout'        : 0,
+        'withCredentials': false
+      })
+    })
+
+    it('does not set auth-key header when authKey is not passed', async () => {
+      const transaction = registerNodeTransaction()
+
+      await Request.get('http://foo.bar:9898/path/to/api')
+        .authKey()
+
+      expect(transaction.options).toEqual({
+        'headers'        : {},
+        'host'           : 'foo.bar',
+        'method'         : 'GET',
+        'path'           : '/path/to/api',
+        'port'           : '9898',
+        'timeout'        : 0,
+        'withCredentials': false
+      })
+    })
+
+    it('combines basicAuth, authKey and custom headers', async () => {
+      const transaction = registerNodeTransaction()
+
+      const request = Request.get('http://foo.bar:9898/path/to/api')
+
+      expect(request.basicAuth({ token: 'my-basic-auth-token' })).toBe(request)
+      expect(request.authKey('my-auth-key')).toBe(request)
+
+      await request.set('header1', 'value1')
+
+      expect(transaction.options).toEqual({
+        'headers'        : {
+          'Authorization': 'Basic my-basic-auth-token',
+          'auth-key'     : 'my-auth-key',
+          'header1'      : 'value1',
+        },
+        'host'           : 'foo.bar',
+        'method'         : 'GET',
+        'path'           : '/path/to/api',
+        'port'           : '9898',
+        'timeout'        : 0,
+        'withCredentials': false
+      })
+    })
   })
 
   describe('Request Content Type', () => {

@@ -49,6 +49,35 @@ export class Request extends EventEmitter {
   }
 
   /**
+   * Shortcut for req.set('Authorization', `Basic ${basicAuth.token}`)
+   *
+   * @param {Object} [basicAuth]
+   * @param {String} basicAuth.token
+   * @returns {Request}
+   */
+  basicAuth(basicAuth) {
+    if (basicAuth) {
+      this.set({ Authorization: `Basic ${basicAuth.token}` })
+    }
+
+    return this
+  }
+
+  /**
+   * Shortcut for req.set('auth-key', authKey)
+   *
+   * @param {String} [authKey]
+   * @returns {Request}
+   */
+  authKey(authKey) {
+    if (authKey) {
+      this.set({ 'auth-key': authKey })
+    }
+
+    return this
+  }
+
+  /**
    * Which kind of tags this request affects.
    * Used for cache validation.
    * Non GET requests with defined tags, will clean all related to these tags caches
