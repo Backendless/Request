@@ -15,12 +15,14 @@ Object.defineProperty(Request, 'FormData', {
 
 Request.XMLHttpRequest = typeof XMLHttpRequest !== 'undefined' ? XMLHttpRequest : undefined
 
-Request.send = (path, method, headers, body, encoding, timeout, withCredentials) => {
+// `tlsOptions` is meaningful for the Node client only, XMLHttpRequest gives no control over the
+// client certificate - a browser picks it from the OS/browser keystore when a server asks for one
+Request.send = (path, method, headers, body, encoding, timeout, withCredentials, tlsOptions) => {
   const sender = typeof Request.XMLHttpRequest !== 'undefined'
     ? sendXmlHttpRequest
     : sendNodeAPIRequest
 
-  return sender(path, method, headers, body, encoding, timeout, withCredentials)
+  return sender(path, method, headers, body, encoding, timeout, withCredentials, tlsOptions)
 }
 
 Request.verbose = false

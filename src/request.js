@@ -6,6 +6,10 @@ import { ResponseError } from './error'
 
 const CONTENT_TYPE_HEADER = 'Content-Type'
 
+// the only TLS options a caller may pass, everything else (rejectUnauthorized and friends) is
+// dropped on purpose so that a config blob can not weaken the connection by accident
+const TLS_OPTION_KEYS = ['cert', 'key', 'passphrase', 'ca']
+
 const REQUEST_EVENT = 'request'
 const RESPONSE_EVENT = 'response'
 const ERROR_EVENT = 'error'
@@ -27,6 +31,15 @@ export class Request extends EventEmitter {
     this.encoding = 'utf8'
     this.timeout = 0
     this.withCredentials = null
+
+    // the private key is credential material, a non enumerable property keeps it out of
+    // console.log(request)/JSON.stringify(request) in whatever logging a caller has around
+    Object.defineProperty(this, 'tlsOptions', {
+      value       : undefined,
+      writable    : true,
+      enumerable  : false,
+      configurable: true,
+    })
   }
 
   /**
@@ -72,6 +85,31 @@ export class Request extends EventEmitter {
   authKey(authKey) {
     if (authKey) {
       this.set({ 'auth-key': authKey })
+    }
+
+    return this
+  }
+
+  /**
+   * Attaches a TLS client certificate and private key to the request (mutual TLS).
+   *
+   * Works only for Node js, in a browser the client certificate is chosen by the browser itself.
+   *
+   * Calling the method several times merges the options, so the certificate and the key may come
+   * from different places. Options other than the ones listed below are ignored.
+   *
+   * @param {Object} [tlsOptions]
+   * @param {String|Buffer|Array} tlsOptions.cert PEM encoded client certificate (or chain)
+   * @param {String|Buffer|Array} tlsOptions.key PEM encoded private key
+   * @param {String} [tlsOptions.passphrase] passphrase of an encrypted private key
+   * @param {String|Buffer|Array} [tlsOptions.ca] PEM encoded CA bundle to verify the server with
+   * @returns {Request}
+   */
+  cert(tlsOptions) {
+    const options = tlsOptions && pickTLSOptions(tlsOptions)
+
+    if (options && Object.keys(options).length) {
+      this.tlsOptions = { ...this.tlsOptions, ...options }
     }
 
     return this
@@ -293,7 +331,8 @@ export class Request extends EventEmitter {
       body,
       this.encoding,
       this.timeout,
-      withCredentials
+      withCredentials,
+      this.tlsOptions
     )
       .then(parseBody)
       .then(checkStatus)
@@ -341,6 +380,22 @@ export class Request extends EventEmitter {
 
     return this.promise.catch(errorHandler)
   }
+}
+
+/**
+ * Keeps only the known TLS options and skips the empty ones,
+ * `undefined` values would otherwise overwrite already collected options on a merge
+ */
+function pickTLSOptions(tlsOptions) {
+  const result = {}
+
+  TLS_OPTION_KEYS.forEach(key => {
+    if (tlsOptions[key] !== undefined && tlsOptions[key] !== null) {
+      result[key] = tlsOptions[key]
+    }
+  })
+
+  return result
 }
 
 function parseBody(res) {

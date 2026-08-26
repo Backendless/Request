@@ -394,6 +394,27 @@ describe('Browser Client', () => {
     })
   })
 
+  describe('Client Certificate', () => {
+    // XMLHttpRequest gives no control over the client certificate, a browser picks it from the
+    // OS/browser keystore, so .cert() must simply not disturb the request
+    it('does not affect the request', async () => {
+      const transaction = registerBrowserTransaction({ foo: 123 })
+
+      const result = await Request.get('https://foo.bar/path/to/api')
+        .cert({ cert: 'client-cert', key: 'private-key', passphrase: '123456', ca: 'ca-bundle' })
+
+      expect(result).toEqual({ foo: 123 })
+
+      expect(transaction.options).toEqual({
+        'async'  : true,
+        'headers': {},
+        'method' : 'GET',
+        'path'   : 'https://foo.bar/path/to/api',
+        'timeout': 0
+      })
+    })
+  })
+
   describe('Request Content Type', () => {
     it('runs a request with headers', async () => {
       const transaction = registerBrowserTransaction()

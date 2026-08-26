@@ -1,10 +1,11 @@
 import { Buffer } from 'buffer'
+import https from 'https'
 import FormData from 'form-data'
 
 import Request from '../../src'
 import { cache } from '../../src/cache'
 
-import { registerNodeTransaction, wait } from '../helpers'
+import { EventEmitter, registerNodeTransaction, wait } from '../helpers'
 import { isBrowser, isNodeJS } from '../../src/utils'
 
 jest.mock('../../src/utils', () => {
@@ -456,6 +457,401 @@ describe('Node Client', () => {
         'timeout'        : 0,
         'withCredentials': false
       })
+    })
+  })
+
+  describe('Client Certificate', () => {
+    const CLIENT_CERT = '-----BEGIN CERTIFICATE-----\nfake-client-certificate\n-----END CERTIFICATE-----'
+    const CLIENT_KEY = '-----BEGIN ENCRYPTED PRIVATE KEY-----\nfake-private-key\n-----END ENCRYPTED PRIVATE KEY-----'
+    const KEY_PASSPHRASE = '123456'
+    const CA_BUNDLE = '-----BEGIN CERTIFICATE-----\nfake-ca-bundle\n-----END CERTIFICATE-----'
+
+    const baseOptions = {
+      'headers'        : {},
+      'host'           : 'foo.bar',
+      'method'         : 'GET',
+      'path'           : '/path/to/api',
+      'port'           : 443,
+      'timeout'        : 0,
+      'withCredentials': false,
+    }
+
+    // makes the http client fail the way node does, either while building the secure context
+    // (a synchronous throw) or later on, once the handshake is already running
+    const registerFailingNodeTransaction = (error, { sync } = {}) => {
+      jest.spyOn(https, 'request').mockImplementationOnce(() => {
+        if (sync) {
+          throw error
+        }
+
+        const req = new EventEmitter()
+
+        req.write = () => undefined
+        req.end = () => setImmediate(() => req.emit('error', error))
+
+        return req
+      })
+    }
+
+    const failureOf = async request => {
+      try {
+        await request
+
+        throw new Error('the request was expected to fail')
+      } catch (error) {
+        return error
+      }
+    }
+
+    it('sends the client certificate and the private key', async () => {
+      const transaction = registerNodeTransaction()
+
+      await Request.get('https://foo.bar/path/to/api')
+        .cert({ cert: CLIENT_CERT, key: CLIENT_KEY })
+
+      expect(transaction.options).toEqual({
+        ...baseOptions,
+        'cert': CLIENT_CERT,
+        'key' : CLIENT_KEY,
+      })
+    })
+
+    it('sends the passphrase of an encrypted private key and a custom CA bundle', async () => {
+      const transaction = registerNodeTransaction()
+
+      await Request.get('https://foo.bar/path/to/api')
+        .cert({ cert: CLIENT_CERT, key: CLIENT_KEY, passphrase: KEY_PASSPHRASE, ca: CA_BUNDLE })
+
+      expect(transaction.options).toEqual({
+        ...baseOptions,
+        'cert'      : CLIENT_CERT,
+        'key'       : CLIENT_KEY,
+        'passphrase': KEY_PASSPHRASE,
+        'ca'        : CA_BUNDLE,
+      })
+    })
+
+    it('merges options collected over several calls and is chainable', async () => {
+      const transaction = registerNodeTransaction()
+
+      const request = Request.get('https://foo.bar/path/to/api')
+
+      expect(request.cert({ cert: CLIENT_CERT })).toBe(request)
+      expect(request.cert({ key: CLIENT_KEY, passphrase: KEY_PASSPHRASE })).toBe(request)
+      expect(request.cert({ passphrase: 'overridden-passphrase' })).toBe(request)
+
+      await request
+
+      expect(transaction.options).toEqual({
+        ...baseOptions,
+        'cert'      : CLIENT_CERT,
+        'key'       : CLIENT_KEY,
+        'passphrase': 'overridden-passphrase',
+      })
+    })
+
+    it('ignores options which are not certificate material', async () => {
+      const transaction = registerNodeTransaction()
+
+      await Request.get('https://foo.bar/path/to/api')
+        .cert({ cert: CLIENT_CERT, key: CLIENT_KEY, rejectUnauthorized: false, agent: 'my-agent' })
+
+      expect(transaction.options).toEqual({
+        ...baseOptions,
+        'cert': CLIENT_CERT,
+        'key' : CLIENT_KEY,
+      })
+    })
+
+    it('does not change the request when there is nothing to attach', async () => {
+      const transaction = registerNodeTransaction()
+
+      await Request.get('https://foo.bar/path/to/api')
+        .cert()
+        .cert({})
+        .cert({ cert: undefined, key: null })
+
+      expect(transaction.options).toEqual(baseOptions)
+    })
+
+    it('sends the client certificate with a body, a token request needs it too', async () => {
+      const transaction = registerNodeTransaction()
+
+      await Request.post('https://foo.bar/oauth2/token')
+        .cert({ cert: CLIENT_CERT, key: CLIENT_KEY })
+        .type('application/x-www-form-urlencoded')
+        .send('grant_type=client_credentials')
+
+      expect(transaction.requestBody).toEqual('grant_type=client_credentials')
+
+      expect(transaction.options).toEqual({
+        ...baseOptions,
+        'headers': {
+          'Content-Type'  : 'application/x-www-form-urlencoded',
+          'content-length': 29,
+        },
+        'method' : 'POST',
+        'path'   : '/oauth2/token',
+        'cert'   : CLIENT_CERT,
+        'key'    : CLIENT_KEY,
+      })
+    })
+
+    it('sends the client certificate with a form body', async () => {
+      const transaction = registerNodeTransaction()
+
+      const form = new FormData()
+      form.append('foo', 'bar')
+
+      await Request.post('https://foo.bar/path/to/api')
+        .cert({ cert: CLIENT_CERT, key: CLIENT_KEY })
+        .form(form)
+
+      expect(transaction.options.cert).toEqual(CLIENT_CERT)
+      expect(transaction.options.key).toEqual(CLIENT_KEY)
+    })
+
+    it('refuses to send a client certificate over a non https url', async () => {
+      const error = await failureOf(
+        Request.get('http://foo.bar:9898/path/to/api').cert({ cert: CLIENT_CERT, key: CLIENT_KEY })
+      )
+
+      expect(error.name).toEqual('TLSError')
+      expect(error.code).toEqual('TLS_ERROR')
+      expect(error.message).toEqual('A client certificate can only be used with an https:// URL.')
+    })
+
+    it('refuses to send a client certificate to a url without a protocol', async () => {
+      const error = await failureOf(
+        Request.get('foo.bar/path/to/api').cert({ cert: CLIENT_CERT, key: CLIENT_KEY })
+      )
+
+      expect(error.name).toEqual('TLSError')
+      expect(error.message).toEqual('A client certificate can only be used with an https:// URL.')
+    })
+
+    it('keeps the private key out of the request instance and of the verbose log', async () => {
+      const log = jest.spyOn(console, 'log').mockImplementation()
+
+      registerNodeTransaction()
+
+      Request.verbose = true
+
+      const request = Request.post('https://foo.bar/path/to/api')
+        .cert({ cert: CLIENT_CERT, key: CLIENT_KEY, passphrase: KEY_PASSPHRASE, ca: CA_BUNDLE })
+
+      await request.send({ num: 123 })
+
+      Request.verbose = false
+
+      expect(Object.keys(request)).not.toContain('tlsOptions')
+      expect(JSON.stringify(request)).not.toContain('fake-private-key')
+
+      const logged = JSON.stringify(log.mock.calls)
+
+      expect(log.mock.calls).toHaveLength(1)
+      expect(logged).not.toContain('fake-private-key')
+      expect(logged).not.toContain('fake-client-certificate')
+      expect(logged).not.toContain(KEY_PASSPHRASE)
+    })
+
+    it('reports an encrypted private key which could not be decrypted', async () => {
+      registerFailingNodeTransaction(Object.assign(
+        new Error('error:06065064:digital envelope routines:EVP_DecryptFinal_ex:bad decrypt'),
+        { code: 'ERR_OSSL_EVP_BAD_DECRYPT' }
+      ), { sync: true })
+
+      const error = await failureOf(
+        Request.get('https://foo.bar/path/to/api').cert({ cert: CLIENT_CERT, key: CLIENT_KEY })
+      )
+
+      expect(error.name).toEqual('TLSError')
+      expect(error.code).toEqual('ERR_OSSL_EVP_BAD_DECRYPT')
+      expect(error.message).toEqual(
+        'The private key could not be decrypted, the passphrase is missing or incorrect. (ERR_OSSL_EVP_BAD_DECRYPT)'
+      )
+    })
+
+    it('reports certificate material which is not valid PEM', async () => {
+      registerFailingNodeTransaction(Object.assign(
+        new Error('error:0909006C:PEM routines:get_name:no start line'),
+        { code: 'ERR_OSSL_PEM_NO_START_LINE' }
+      ), { sync: true })
+
+      const error = await failureOf(
+        Request.get('https://foo.bar/path/to/api').cert({ cert: 'not-a-pem', key: CLIENT_KEY })
+      )
+
+      expect(error.message).toEqual(
+        'The client certificate or the private key is not valid PEM. (ERR_OSSL_PEM_NO_START_LINE)'
+      )
+    })
+
+    it('reports a server which demands a client certificate before anything else', async () => {
+      registerFailingNodeTransaction(Object.assign(
+        new Error('error:0A00045C:SSL routines:ssl3_read_bytes:tlsv13 alert certificate required'),
+        { code: 'ERR_SSL_TLSV13_ALERT_CERTIFICATE_REQUIRED' }
+      ))
+
+      const error = await failureOf(Request.get('https://foo.bar/path/to/api'))
+
+      expect(error.name).toEqual('TLSError')
+      expect(error.message).toEqual(
+        'The server requires a client certificate and none was supplied. (ERR_SSL_TLSV13_ALERT_CERTIFICATE_REQUIRED)'
+      )
+    })
+
+    it('reports a client certificate the server rejected as revoked', async () => {
+      registerFailingNodeTransaction(Object.assign(
+        new Error('write EPROTO ... sslv3 alert certificate revoked'),
+        { code: 'EPROTO' }
+      ))
+
+      const error = await failureOf(
+        Request.get('https://foo.bar/path/to/api').cert({ cert: CLIENT_CERT, key: CLIENT_KEY })
+      )
+
+      expect(error.message).toEqual(
+        'The server rejected the client certificate because it has been revoked. (EPROTO)'
+      )
+    })
+
+    it('reports a handshake the server refused without naming a reason', async () => {
+      registerFailingNodeTransaction(Object.assign(
+        new Error('write EPROTO ... sslv3 alert handshake failure'),
+        { code: 'EPROTO' }
+      ))
+
+      const error = await failureOf(
+        Request.get('https://foo.bar/path/to/api').cert({ cert: CLIENT_CERT, key: CLIENT_KEY })
+      )
+
+      expect(error.message).toEqual(
+        'The server rejected the TLS handshake, the client certificate is missing or was rejected. (EPROTO)'
+      )
+    })
+
+    it('reports a private key which does not match the client certificate', async () => {
+      registerFailingNodeTransaction(Object.assign(
+        new Error('error:05800074:x509 certificate routines:X509_check_private_key:key values mismatch'),
+        { code: 'ERR_OSSL_X509_KEY_VALUES_MISMATCH' }
+      ), { sync: true })
+
+      const error = await failureOf(
+        Request.get('https://foo.bar/path/to/api').cert({ cert: CLIENT_CERT, key: CLIENT_KEY })
+      )
+
+      expect(error.message).toEqual(
+        'The private key does not match the client certificate. (ERR_OSSL_X509_KEY_VALUES_MISMATCH)'
+      )
+    })
+
+    it('keeps the original error available as the cause', async () => {
+      const cause = Object.assign(new Error('socket hang up'), { code: 'ECONNRESET' })
+
+      registerFailingNodeTransaction(cause)
+
+      const error = await failureOf(
+        Request.get('https://foo.bar/path/to/api').cert({ cert: CLIENT_CERT, key: CLIENT_KEY })
+      )
+
+      expect(error.cause).toBe(cause)
+    })
+
+    it('reports a client certificate the server rejected as expired', async () => {
+      registerFailingNodeTransaction(Object.assign(
+        new Error('write EPROTO ... alert certificate expired'),
+        { code: 'EPROTO' }
+      ))
+
+      const error = await failureOf(
+        Request.get('https://foo.bar/path/to/api').cert({ cert: CLIENT_CERT, key: CLIENT_KEY })
+      )
+
+      expect(error.name).toEqual('TLSError')
+      expect(error.message).toEqual(
+        'The server rejected the client certificate because it has expired. (EPROTO)'
+      )
+    })
+
+    it('reports a client certificate issued by an authority the server does not trust', async () => {
+      registerFailingNodeTransaction(Object.assign(
+        new Error('write EPROTO ... tlsv1 alert unknown ca'),
+        { code: 'EPROTO' }
+      ))
+
+      const error = await failureOf(
+        Request.get('https://foo.bar/path/to/api').cert({ cert: CLIENT_CERT, key: CLIENT_KEY })
+      )
+
+      expect(error.message).toEqual(
+        'The server does not trust the authority which issued the client certificate. (EPROTO)'
+      )
+    })
+
+    it('reports a server which closes the connection during the handshake', async () => {
+      registerFailingNodeTransaction(Object.assign(new Error('socket hang up'), { code: 'ECONNRESET' }))
+
+      const error = await failureOf(
+        Request.get('https://foo.bar/path/to/api').cert({ cert: CLIENT_CERT, key: CLIENT_KEY })
+      )
+
+      expect(error.name).toEqual('TLSError')
+      expect(error.message).toEqual(
+        'The connection was closed during the TLS handshake, '
+        + 'the client certificate was most likely missing, rejected or expired. (ECONNRESET)'
+      )
+    })
+
+    it('reports a server certificate which can not be verified with the given CA bundle', async () => {
+      registerFailingNodeTransaction(Object.assign(
+        new Error('unable to verify the first certificate'),
+        { code: 'UNABLE_TO_VERIFY_LEAF_SIGNATURE' }
+      ))
+
+      const error = await failureOf(
+        Request.get('https://foo.bar/path/to/api').cert({ cert: CLIENT_CERT, key: CLIENT_KEY, ca: CA_BUNDLE })
+      )
+
+      expect(error.message).toEqual(
+        'The server certificate could not be verified, a CA bundle may be required. '
+        + '(UNABLE_TO_VERIFY_LEAF_SIGNATURE)'
+      )
+    })
+
+    it('reports an expired server certificate even without a client certificate', async () => {
+      registerFailingNodeTransaction(Object.assign(
+        new Error('certificate has expired'),
+        { code: 'CERT_HAS_EXPIRED' }
+      ))
+
+      const error = await failureOf(Request.get('https://foo.bar/path/to/api'))
+
+      expect(error.name).toEqual('TLSError')
+      expect(error.message).toEqual('The server certificate has expired. (CERT_HAS_EXPIRED)')
+    })
+
+    it('leaves a dropped connection alone when there is no client certificate', async () => {
+      registerFailingNodeTransaction(Object.assign(new Error('socket hang up'), { code: 'ECONNRESET' }))
+
+      const error = await failureOf(Request.get('https://foo.bar/path/to/api'))
+
+      expect(error.name).toEqual('Error')
+      expect(error.message).toEqual('socket hang up')
+    })
+
+    it('leaves an error which has nothing to do with TLS alone', async () => {
+      registerFailingNodeTransaction(Object.assign(
+        new Error('connect ECONNREFUSED 127.0.0.1:443'),
+        { code: 'ECONNREFUSED' }
+      ))
+
+      const error = await failureOf(
+        Request.get('https://foo.bar/path/to/api').cert({ cert: CLIENT_CERT, key: CLIENT_KEY })
+      )
+
+      expect(error.name).toEqual('Error')
+      expect(error.message).toEqual('connect ECONNREFUSED 127.0.0.1:443')
     })
   })
 

@@ -27,6 +27,8 @@ backendless.min.js => ~ 11 KB
   - [Form](#form)
   - [ContentType Header](#contenttype-header)
 
+- [Client Certificate (mutual TLS)](#client-certificate-mutual-tls)
+
 - [Request Events](#request-events)
 
 - [Caching Requests](#caching-requests)
@@ -195,6 +197,75 @@ BackendlessRequest.get('https://foo.bar/')
   .then(result => console.log(result))
   .catch(error => console.error(error))
 ````
+
+### Client Certificate (mutual TLS)
+Some APIs, most of them in regulated banking, require the client to present a TLS certificate of its own
+before they will answer at all. Use the `.cert(tlsOptions)` method to attach one.
+
+````js
+BackendlessRequest.post('https://api.vendor.com/some-path')
+  .cert({
+    cert      : clientCertPem,   // PEM encoded client certificate (or chain)
+    key       : clientKeyPem,    // PEM encoded private key
+    passphrase: keyPassphrase,   // optional, for an encrypted private key
+    ca        : caBundlePem      // optional, a custom CA bundle to verify the server with
+  })
+  .set({ 'Content-Type': 'application/json' })
+  .send(body)
+  .then(result => console.log(result))
+  .catch(error => console.error(error))
+````
+
+Every option accepts a `String`, a `Buffer` or an array of them, exactly as the Node
+[TLS options](https://nodejs.org/api/tls.html#tlscreatesecurecontextoptions) do.
+Options other than the four above are ignored, so a connection can not be weakened by accident.
+
+The method can be called several times and the options are merged, which lets the certificate and the
+key come from different places:
+
+````js
+BackendlessRequest.get('https://api.vendor.com/accounts')
+  .cert({ cert: clientCertPem, key: clientKeyPem })
+  .cert({ ca: caBundlePem })
+````
+
+A few things worth knowing:
+
+- **The certificate must be attached to the token request too.** Servers of this kind usually demand the
+  certificate before authentication, so their OAuth2 token endpoint is unreachable without it as well.
+- **It works in Node.js only.** In a browser `XMLHttpRequest` gives no control over the client certificate,
+  the browser picks one from the keystore itself, so `.cert()` there does nothing.
+- **A client certificate requires an `https://` URL.** Sending it over `http://` would silently drop it and
+  put the request on the wire in plain text, so the request fails instead.
+- **`ca` replaces the default trust store** for that request, the same way `curl --cacert` does. Pass the
+  full chain that is needed to verify the server.
+- **The private key is credential material.** Store it the way you store a password, never inline it into a
+  URL. The library keeps it out of `BackendlessRequest.verbose` output and off the enumerable properties of
+  the request, so it does not end up in a log through `console.log(request)` or `JSON.stringify(request)`.
+
+#### TLS errors
+A failed handshake would otherwise surface as an opaque socket error, so recognized failures are raised as a
+`TLSError` with a message that says what went wrong. `error.code` keeps the original Node/OpenSSL code and
+`error.cause` the original error.
+
+````
+The server requires a client certificate and none was supplied. (ERR_SSL_TLSV13_ALERT_CERTIFICATE_REQUIRED)
+The server rejected the client certificate because it has expired. (EPROTO)
+The private key could not be decrypted, the passphrase is missing or incorrect. (ERR_OSSL_BAD_DECRYPT)
+The client certificate or the private key is not valid PEM. (ERR_OSSL_PEM_NO_START_LINE)
+The server certificate has expired. (CERT_HAS_EXPIRED)
+The server certificate could not be verified, a CA bundle may be required. (UNABLE_TO_VERIFY_LEAF_SIGNATURE)
+````
+
+When a server just drops the connection instead of sending a TLS alert, which is what a TLS 1.3 server
+typically does when it does not accept the certificate, the error says so:
+
+````
+The connection was closed during the TLS handshake, the client certificate was most likely missing,
+rejected or expired. (ECONNRESET)
+````
+
+Errors which have nothing to do with TLS are left untouched.
 
 ### Request Events
 A request instance might fire events to notify about changing request state:

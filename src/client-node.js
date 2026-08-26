@@ -1,6 +1,7 @@
 import { isFormData, isStream, normalizeTrailingSlashInPath } from './utils'
+import { TLSError, toTLSError } from './error'
 
-export function sendNodeAPIRequest(path, method, headers, body, encoding, timeout, withCredentials) {
+export function sendNodeAPIRequest(path, method, headers, body, encoding, timeout, withCredentials, tlsOptions) {
   return new Promise((resolve, reject) => {
     const u = require('url').parse(path)
     const form = isFormData(body) && body
@@ -18,6 +19,21 @@ export function sendNodeAPIRequest(path, method, headers, body, encoding, timeou
     if (typeof withCredentials === 'boolean') {
       options.withCredentials = withCredentials
     }
+
+    const withClientCert = !!(tlsOptions && (tlsOptions.cert || tlsOptions.key))
+
+    if (tlsOptions) {
+      if (!https) {
+        // going ahead would silently drop the certificate and send the request in plain text,
+        // there is no mutual TLS without TLS
+        return reject(new TLSError('A client certificate can only be used with an https:// URL.'))
+      }
+
+      Object.assign(options, tlsOptions)
+    }
+
+    // a TLS failure arrives here as an opaque socket/OpenSSL error, translate the ones we recognize
+    const rejectWithError = error => reject(toTLSError(error, withClientCert) || error)
 
     const _send = () => {
       const Buffer = require('buffer').Buffer
@@ -56,10 +72,10 @@ export function sendNodeAPIRequest(path, method, headers, body, encoding, timeou
           resolve({ status, statusText, headers, body })
         })
 
-        res.on('error', reject)
+        res.on('error', rejectWithError)
       })
 
-      req.on('error', reject)
+      req.on('error', rejectWithError)
 
       req.on('timeout', () => {
         req.destroy(new Error('Connection aborted due to timeout'))
@@ -77,6 +93,16 @@ export function sendNodeAPIRequest(path, method, headers, body, encoding, timeou
       req.end()
     }
 
+    // an unusable certificate/key/passphrase makes https.request() throw synchronously, and for a
+    // form body _send() runs from a callback where a throw would escape the promise altogether
+    const send = () => {
+      try {
+        _send()
+      } catch (error) {
+        rejectWithError(error)
+      }
+    }
+
     if (form) {
       Object.assign(options.headers, form.getHeaders())
 
@@ -85,7 +111,7 @@ export function sendNodeAPIRequest(path, method, headers, body, encoding, timeou
           options.headers['content-length'] = length
         }
 
-        _send()
+        send()
       })
     } else {
       if (body && !options.headers['content-length']) {
@@ -93,7 +119,7 @@ export function sendNodeAPIRequest(path, method, headers, body, encoding, timeou
         options.headers['content-length'] = Buffer.byteLength(body)
       }
 
-      _send()
+      send()
     }
   })
 }
