@@ -1,14 +1,9 @@
-import { cache } from './cache'
 import EventEmitter from './event-emitter'
 import * as qs from './qs'
 import { castArray, isObject, isFormData, ensureEncoding } from './utils'
 import { ResponseError } from './error'
 
 const CONTENT_TYPE_HEADER = 'Content-Type'
-
-// methods which can not change anything on the server, a request made with one of them must not
-// invalidate the cached responses
-const SAFE_METHODS = ['get', 'head', 'options']
 
 // the only TLS options a caller may pass, everything else (rejectUnauthorized and friends) is
 // dropped on purpose so that a config blob can not weaken the connection by accident
@@ -27,9 +22,7 @@ export class Request extends EventEmitter {
     this.method = method
     this.path = ensureEncoding(path)
     this.body = body
-    this.tags = undefined
     this.unwrap = true
-    this.cacheTTL = 0
     this.headers = {}
     this.queryParams = {}
     this.encoding = 'utf8'
@@ -120,21 +113,6 @@ export class Request extends EventEmitter {
   }
 
   /**
-   * Which kind of tags this request affects.
-   * Used for cache validation.
-   * Requests with defined tags made with a method which changes the server state,
-   * will clean all related to these tags caches
-   *
-   * @param {Array.<String>} tags
-   * @returns {Request}
-   */
-  cacheTags(...tags) {
-    this.tags = tags
-
-    return this
-  }
-
-  /**
    * @param {Object} queryParams
    * @returns {Request}
    */
@@ -167,32 +145,6 @@ export class Request extends EventEmitter {
 
         this.body = formData
       }
-    }
-
-    return this
-  }
-
-  /**
-   * Should we cache or use cached result
-   *
-   * @param {Number} ttl Time to live for cached response. 15 seconds by default
-   * @returns {Request}
-   */
-  useCache(ttl = 15000) {
-    this.cacheTTL = ttl
-
-    return this
-  }
-
-  /**
-   * Reset cache if passed TRUE and tags has been specified before
-   *
-   * @param {Boolean} reset - flag to reset cache or not
-   * @returns {Request}
-   */
-  resetCache(reset) {
-    if (reset && this.tags) {
-      cache.deleteByTags(this.tags)
     }
 
     return this
@@ -273,14 +225,6 @@ export class Request extends EventEmitter {
       path += '?' + queryString
     }
 
-    if (this.cacheTTL) {
-      const cached = cache.get(path)
-
-      if (cached !== undefined) {
-        return Promise.resolve(cached)
-      }
-    }
-
     const type = this.headers[CONTENT_TYPE_HEADER]
 
     if (!type && isObject(body) && !isFormData(body)) {
@@ -295,28 +239,6 @@ export class Request extends EventEmitter {
 
     const unwrapBody = res => {
       return this.unwrap ? res.body : res
-    }
-
-    /**
-     * Caches the response if required
-     */
-    const cacheResponse = res => {
-      if (this.cacheTTL) {
-        cache.set(path, res, this.tags, this.cacheTTL)
-      }
-
-      return res
-    }
-
-    /**
-     * Deletes all relevant to req.cacheTags keys from the cache if this request method is not a safe one
-     */
-    const flushCache = res => {
-      if (this.tags && !SAFE_METHODS.includes(this.method)) {
-        cache.deleteByTags(this.tags)
-      }
-
-      return res
     }
 
     if (Request.verbose) {
@@ -342,8 +264,6 @@ export class Request extends EventEmitter {
       .then(parseBody)
       .then(checkStatus)
       .then(unwrapBody)
-      .then(cacheResponse)
-      .then(flushCache)
       .catch(error => {
         error.stack = `${error.stack}${syncError.stack}`
 

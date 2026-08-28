@@ -1,4 +1,3 @@
-import { cache } from '../../src/cache'
 
 import * as QS from '../../src/qs'
 
@@ -11,10 +10,6 @@ jest.mock('../../src/utils', () => {
 })
 
 describe('QueryString Utils', () => {
-
-  afterEach(() => {
-    cache.deleteAll()
-  })
 
   describe('stringify', () => {
     it('converts special chars', async () => {

@@ -33,10 +33,6 @@ backendless.min.js => ~ 11 KB
 
 - [Request Events](#request-events)
 
-- [Caching Requests](#caching-requests)
-  - [Cache Tags](#cache-tags)
-  - [Reset Cache](#reset-cache)
-
 - [Own XMLHttpRequest](#own-xmlhttprequest)
 
 - [Logging](#logging)
@@ -312,57 +308,6 @@ BackendlessRequest.post('https://foo.bar/some-path')
 - `done` - it will be fired when a request is done, it's a shortcut for `response` and `error`
  
  
-### Caching Requests
-The feature allows you to have some responses cached and reset the cache by the next requests.
-
-#### Cache Tags
-Cache tags help you to keep your cache up-to-date 
- 
-For example, you have a route to retrieve a list of `Persons` and you want to cache the result for the same requests, 
-for this, you need to specify a cache tag and set `TTL` via `useCache` method, 
-after that when you do the request again the response will be retrieved from the cache store.
-
-````js
-// get list of persons
-BackendlessRequest.get('https://your-domain.com/persons')
-  .cacheTags(['persons'])
-  .useCache(30 * 1000) // cache time to live is 30 seconds, by default it's 15 seconds
-  .then(result => console.log(result))
-  .catch(error => console.error(error))
-````
-
-You can use as many tags as you need 
-
-````js
-// get list of persons
-BackendlessRequest.get('https://your-domain.com/persons')
-  .cacheTags(['persons', 'friends', 'posts'])
-  .useCache()
-  .then(result => console.log(result))
-  .catch(error => console.error(error))
-````
-
-#### Reset Cache
-In many cases you want to reset the cache when doing some requests that can change values on the server 
-
-````js
-// create a new person
-BackendlessRequest.post('https://your-domain.com/persons', { name: 'Bob' })
-  .cacheTags(['persons'])
-  .resetCache(true)
-  .then(result => console.log(result))
-  .catch(error => console.error(error))
-````
-
-````js
-// create a new person
-BackendlessRequest.delete('https://your-domain.com/persons/personId')
-  .cacheTags(['persons'])
-  .resetCache(true)
-  .then(result => console.log(result))
-  .catch(error => console.error(error))
-```` 
-
 ### Own XMLHttpRequest
 You can use your own XMLHttpRequest, just replace it in `BackendlessRequest` namespace.
 
