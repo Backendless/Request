@@ -6,6 +6,10 @@ import { ResponseError } from './error'
 
 const CONTENT_TYPE_HEADER = 'Content-Type'
 
+// methods which can not change anything on the server, a request made with one of them must not
+// invalidate the cached responses
+const SAFE_METHODS = ['get', 'head', 'options']
+
 // the only TLS options a caller may pass, everything else (rejectUnauthorized and friends) is
 // dropped on purpose so that a config blob can not weaken the connection by accident
 const TLS_OPTION_KEYS = ['cert', 'key', 'passphrase', 'ca']
@@ -118,7 +122,8 @@ export class Request extends EventEmitter {
   /**
    * Which kind of tags this request affects.
    * Used for cache validation.
-   * Non GET requests with defined tags, will clean all related to these tags caches
+   * Requests with defined tags made with a method which changes the server state,
+   * will clean all related to these tags caches
    *
    * @param {Array.<String>} tags
    * @returns {Request}
@@ -304,10 +309,10 @@ export class Request extends EventEmitter {
     }
 
     /**
-     * Deletes all relevant to req.cacheTags keys from the cache if this request method is not GET
+     * Deletes all relevant to req.cacheTags keys from the cache if this request method is not a safe one
      */
     const flushCache = res => {
-      if (this.tags && this.method !== 'get') {
+      if (this.tags && !SAFE_METHODS.includes(this.method)) {
         cache.deleteByTags(this.tags)
       }
 

@@ -28,7 +28,7 @@ Request.send = (path, method, headers, body, encoding, timeout, withCredentials,
 Request.verbose = false
 Request.withCredentials = false
 
-Request.methods = ['get', 'post', 'put', 'patch', 'delete']
+Request.methods = ['get', 'post', 'put', 'patch', 'delete', 'head', 'options']
 Request.methods.forEach(method => {
   Request[method] = function(path, body) {
     return new Request(path, method, body)

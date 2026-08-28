@@ -1126,6 +1126,57 @@ describe('Node Client', () => {
         'withCredentials': false
       })
     })
+
+    it('runs a PATCH request', async () => {
+      const transaction = registerNodeTransaction()
+
+      await Request.patch('http://foo.bar:9898/path/to/api', { prop: 123 })
+
+      expect(transaction.requestBody).toEqual('{"prop":123}')
+      expect(transaction.options).toEqual({
+        'headers'        : {
+          'Content-Type': 'application/json', 'content-length': 12
+        },
+        'host'           : 'foo.bar',
+        'method'         : 'PATCH',
+        'path'           : '/path/to/api',
+        'port'           : '9898',
+        'timeout'        : 0,
+        'withCredentials': false
+      })
+    })
+
+    it('runs a HEAD request', async () => {
+      const transaction = registerNodeTransaction()
+
+      await Request.head('http://foo.bar:9898/path/to/api')
+
+      expect(transaction.options).toEqual({
+        'headers'        : {},
+        'host'           : 'foo.bar',
+        'method'         : 'HEAD',
+        'path'           : '/path/to/api',
+        'port'           : '9898',
+        'timeout'        : 0,
+        'withCredentials': false
+      })
+    })
+
+    it('runs an OPTIONS request', async () => {
+      const transaction = registerNodeTransaction()
+
+      await Request.options('http://foo.bar:9898/path/to/api')
+
+      expect(transaction.options).toEqual({
+        'headers'        : {},
+        'host'           : 'foo.bar',
+        'method'         : 'OPTIONS',
+        'path'           : '/path/to/api',
+        'port'           : '9898',
+        'timeout'        : 0,
+        'withCredentials': false
+      })
+    })
   })
 
   describe('Response Error', () => {
@@ -1582,6 +1633,31 @@ describe('Node Client', () => {
       expect(result1).toBe('result1')
 
       expect(result3).toBe('result2')
+    })
+
+    it('does not reset cache by HEAD and OPTIONS requests', async () => {
+      registerNodeTransaction(['result1'])
+      registerNodeTransaction()
+      registerNodeTransaction()
+      registerNodeTransaction(['result2'])
+
+      const result1 = await Request.get('http://foo.bar:9898/path/to/api')
+        .cacheTags('tag1', 'tag2')
+        .useCache()
+
+      await Request.head('http://foo.bar:9898/path/to/api')
+        .cacheTags('tag1')
+
+      await Request.options('http://foo.bar:9898/path/to/api')
+        .cacheTags('tag1')
+
+      const result3 = await Request.get('http://foo.bar:9898/path/to/api')
+        .cacheTags('tag2')
+        .useCache()
+
+      expect(result1).toBe('result1')
+
+      expect(result3).toBe('result1')
     })
   })
 

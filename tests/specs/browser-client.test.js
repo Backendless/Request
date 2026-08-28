@@ -640,6 +640,51 @@ describe('Browser Client', () => {
         'timeout': 0
       })
     })
+
+    it('runs a PATCH request', async () => {
+      const transaction = registerBrowserTransaction()
+
+      await Request.patch('http://foo.bar:9898/path/to/api', { prop: 123 })
+
+      expect(transaction.requestBody).toEqual('{"prop":123}')
+      expect(transaction.options).toEqual({
+        'async'  : true,
+        'headers': {
+          'Content-Type': 'application/json',
+        },
+        'method' : 'PATCH',
+        'path'   : 'http://foo.bar:9898/path/to/api',
+        'timeout': 0
+      })
+    })
+
+    it('runs a HEAD request', async () => {
+      const transaction = registerBrowserTransaction()
+
+      await Request.head('http://foo.bar:9898/path/to/api')
+
+      expect(transaction.options).toEqual({
+        'async'  : true,
+        'headers': {},
+        'method' : 'HEAD',
+        'path'   : 'http://foo.bar:9898/path/to/api',
+        'timeout': 0
+      })
+    })
+
+    it('runs an OPTIONS request', async () => {
+      const transaction = registerBrowserTransaction()
+
+      await Request.options('http://foo.bar:9898/path/to/api')
+
+      expect(transaction.options).toEqual({
+        'async'  : true,
+        'headers': {},
+        'method' : 'OPTIONS',
+        'path'   : 'http://foo.bar:9898/path/to/api',
+        'timeout': 0
+      })
+    })
   })
 
   describe('Response Error', () => {

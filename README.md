@@ -20,6 +20,8 @@ backendless.min.js => ~ 11 KB
   - [PUT](#put)
   - [DELETE](#delete)
   - [PATCH](#patch)
+  - [HEAD](#head)
+  - [OPTIONS](#options)
 
 - [Query Params](#query-params)
 
@@ -144,6 +146,27 @@ BackendlessRequest.delete('https://foo.bar/foo')
 ````js
 BackendlessRequest.patch('https://foo.bar/foo', { bool: false })
   .then(result => console.log(result))
+  .catch(error => console.error(error))
+````
+
+#### HEAD
+
+A HEAD response has no body, so the useful part of the result are the response headers,
+use `.unwrapBody(false)` to get the whole response instead of its body
+
+````js
+BackendlessRequest.head('https://foo.bar/foo')
+  .unwrapBody(false)
+  .then(result => console.log(result.status, result.headers))
+  .catch(error => console.error(error))
+````
+
+#### OPTIONS
+
+````js
+BackendlessRequest.options('https://foo.bar/foo')
+  .unwrapBody(false)
+  .then(result => console.log(result.headers))
   .catch(error => console.error(error))
 ````
 
